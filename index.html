@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css"/>
+</head>
+
+
+
+
+
+<script>
+
+    var canvasHeight;
+    var canvasWidth;
+    var ctx;
+
+    var coordX = 0;
+    var coordY = 0;
+    var moveDireita = 0;
+    var moveEsquerda = 0;
+
+
+
+
+
+function init(){
+
+    console.log("iniciou");
+    //canvasHeight = document.getElementById("canvas").style.height;
+    canvasHeight = document.getElementById("canvas").getAttribute("height");
+    //canvasWidth = document.getElementById("canvas").style.width;
+    canvasWidth = document.getElementById("canvas").getAttribute("width");
+    ctx = document.getElementById("canvas").getContext("2d");
+    window.requestAnimationFrame(draw);
+}
+
+function draw() {
+
+    if(moveDireita == 1){
+        coordX++;
+    }
+    if(moveEsquerda == 1){
+        coordX--;
+    }
+
+    limpaTela(); 
+    desenhaQuadrado();
+
+    window.requestAnimationFrame(draw);
+}
+
+function limpaTela(){
+    console.log(canvasWidth);
+    console.log(canvasHeight);
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+}
+
+function desenhaQuadrado(){
+
+    ctx.fillStyle = "#aaaaaa";
+    ctx.fillRect(10 + coordX, 10, 10, 10);
+}
+
+document.addEventListener("keydown", function(event) {
+  if (event.key == "ArrowRight") {
+    moveDireita = 1;
+  }
+
+  if (event.key == "ArrowLeft") {
+    moveEsquerda = 1;
+  }
+});
+
+document.addEventListener("keyup", function(event) {
+  if (event.key == "ArrowRight") {
+    moveDireita = 0;
+  }
+
+  if (event.key == "ArrowLeft") {
+    moveEsquerda = 0;
+  }
+});
+
+
+window.addEventListener('load', init);
+
+</script>
+
+
+
+<script>
+    //facilitar o desenvolvimento
+    //contexto de colisao quadratica
+    //colocar td no js
+    //nao vai ter desempenho maximo nem rodar em td por hora
+    //ver classes pra ja colocar
+    //colocar contexto de posicionamento e colisao
+    //contexto de bitmap
+    //alguma animacao de ataque
+    //se conseguir duas animacoes de atq versionar
+    //rn - precisa tirar nota em provas escrita e pratia pra ir ranked
+    // const element = document.querySelector("textarea"),
+    //   ArrowRight = k => {
+    //      console.log(k);
+    //   },
+    //   ArrowLeft = k => {
+    //      console.log(k);
+    //   },
+    //   ArrowUp = k => {
+    //      console.log(k);
+    //   },
+    //   ArrowDown = k => {
+    //      console.log(k);
+    //   },
+    //   handler = {
+    //      ArrowRight,
+    //      ArrowLeft,
+    //      ArrowUp,
+    //      ArrowDown
+    //   };
+    //   element.addEventListener("keydown", e => {
+    //      const k = e.key;
+    //      if (handler.hasOwnProperty(k)) {
+    //         handler[k](k);
+    //      }
+    //   });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<body>
+
+    <p style="text-align: center;">uia</p>
+
+    <div style="text-align: center">
+        <canvas id="canvas" width="200" height="500" 
+          style="border: 1px solid #c9c9c9;">
+        </canvas>
+    </div>
+
+
+</body>
+</html>
+
+
+
