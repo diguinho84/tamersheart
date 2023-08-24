@@ -7,12 +7,9 @@
     <link rel="stylesheet" href="style.css"/>
 </head>
 
-
-
-
-
 <script>
 
+    //variaveis
     var canvasHeight;
     var canvasWidth;
     var ctx;
@@ -21,6 +18,26 @@
     var coordY = 0;
     var moveDireita = 0;
     var moveEsquerda = 0;
+    var player = 0;
+
+
+
+    //classes
+    class Quadrado {
+
+      constructor(x, y, width, height){
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+      }
+
+      moveX(dist, interensidade){
+        var intensidade = intensidade ? intensidade : 1;
+        this.x = this.x + dist*intensidade;
+      }
+
+    }
 
 
 
@@ -34,27 +51,34 @@ function init(){
     //canvasWidth = document.getElementById("canvas").style.width;
     canvasWidth = document.getElementById("canvas").getAttribute("width");
     ctx = document.getElementById("canvas").getContext("2d");
+
+
+    player = new Quadrado(10, 10, 10, 10);
+
+
     window.requestAnimationFrame(draw);
 }
 
 function draw() {
 
+
     if(moveDireita == 1){
-        coordX++;
+        player.moveX(1,1)
     }
     if(moveEsquerda == 1){
-        coordX--;
+        player.moveX(-1,1);
     }
 
     limpaTela(); 
-    desenhaQuadrado();
+    desenha(player);
 
     window.requestAnimationFrame(draw);
 }
 
 function limpaTela(){
-    console.log(canvasWidth);
-    console.log(canvasHeight);
+
+    // console.log(canvasWidth);
+    // console.log(canvasHeight);
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 }
 
@@ -62,6 +86,12 @@ function desenhaQuadrado(){
 
     ctx.fillStyle = "#aaaaaa";
     ctx.fillRect(10 + coordX, 10, 10, 10);
+}
+
+function desenha(obj){
+
+    ctx.fillStyle = "#aaaaaa";
+    ctx.fillRect( obj.x, obj.y, obj.width, obj.height);
 }
 
 document.addEventListener("keydown", function(event) {
@@ -92,7 +122,10 @@ window.addEventListener('load', init);
 
 
 <script>
+    // ok - colocar alguns objs e possivelmente uma classe
+
     //facilitar o desenvolvimento
+    //revisar o codigo, comentar codigo, colcar eixoY, e colisao quadratica
     //contexto de colisao quadratica
     //colocar td no js
     //nao vai ter desempenho maximo nem rodar em td por hora
