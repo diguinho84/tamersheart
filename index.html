@@ -59,7 +59,24 @@ function init(){
     window.requestAnimationFrame(draw);
 }
 
-function draw() {
+
+
+//#region Desenho
+//====================Desenho============================
+
+  function desenhaQuadrado(){
+
+      ctx.fillStyle = "#aaaaaa";
+      ctx.fillRect(10 + coordX, 10, 10, 10);
+  }
+
+  function desenha(obj){
+
+      ctx.fillStyle = "#aaaaaa";
+      ctx.fillRect( obj.x, obj.y, obj.width, obj.height);
+  }
+
+  function draw() {
 
 
     if(moveDireita == 1){
@@ -73,26 +90,18 @@ function draw() {
     desenha(player);
 
     window.requestAnimationFrame(draw);
-}
+  }
 
-function limpaTela(){
+  function limpaTela(){
 
-    // console.log(canvasWidth);
-    // console.log(canvasHeight);
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-}
+  }
 
-function desenhaQuadrado(){
+//=====================================================
+//#endregion
 
-    ctx.fillStyle = "#aaaaaa";
-    ctx.fillRect(10 + coordX, 10, 10, 10);
-}
-
-function desenha(obj){
-
-    ctx.fillStyle = "#aaaaaa";
-    ctx.fillRect( obj.x, obj.y, obj.width, obj.height);
-}
+//#region Teclado
+//======================Teclado=======================
 
 document.addEventListener("keydown", function(event) {
   if (event.key == "ArrowRight") {
@@ -114,8 +123,16 @@ document.addEventListener("keyup", function(event) {
   }
 });
 
+//====================================================
+//#endregion
+
+//#region
+//=======================Start=======================
 
 window.addEventListener('load', init);
+
+//===================================================
+
 
 </script>
 
@@ -125,6 +142,7 @@ window.addEventListener('load', init);
     // ok - colocar alguns objs e possivelmente uma classe
 
     //facilitar o desenvolvimento
+    //movimentacao simples, colocar pra Y e adequar classes, colisao simples
     //revisar o codigo, comentar codigo, colcar eixoY, e colisao quadratica
     //contexto de colisao quadratica
     //colocar td no js
