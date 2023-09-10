@@ -18,6 +18,8 @@
     var coordY = 0;
     var moveDireita = 0;
     var moveEsquerda = 0;
+    var moveCima = 0;
+    var moveBaixo = 0;
     var player = 0;
 
     var teclaPressionada;
@@ -25,6 +27,7 @@
 
     var notificaDown;
     var notificaDown;
+
 
 
 
@@ -41,42 +44,16 @@
       moveX(dist, intensidade){
         this.x = this.x + dist * (intensidade ? intensidade : 1);
       }
+
+      moveY(dist, intensidade){
+        this.y = this.y + dist * (intensidade ? intensidade : 1);
+      }
     
     }
 
 
-//#region Desenho
-  function desenhaQuadrado(obj){
 
-      ctx.fillStyle = "#aaaaaa";
-      ctx.fillRect(obj.x, obj.y, obj.width, obj.height);
-  }
-  
-  function desenha(obj){
-
-      ctx.fillStyle = "#aaaaaa";
-      ctx.fillRect( obj.x, obj.y, obj.width, obj.height);
-  }
-  
-  function limpaTela(){
-
-    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-  }
-  
-  function draw() {
-
-    movimentacaoLogica(player);
-
-    limpaTela(); 
-    desenha(player);
-
-    window.requestAnimationFrame(draw);
-  }
-//#endregion
-
-
-
-
+    
 //#region Init Settings
 function initCanvasContextSettings(){
 
@@ -109,13 +86,18 @@ function setaVetoresDirecao(player, e){
   //Como só tem keydown ou keyup deu pra fazer o ternario
   if( e.key == "ArrowRight") {  moveDireita  = e.type == "keydown" ?  1 : 0;}
   if( e.key == "ArrowLeft")  {  moveEsquerda = e.type == "keydown" ?  1 : 0;}
+  if( e.key == "ArrowUp")    {  moveCima     = e.type == "keydown" ?  1 : 0;}
+  if( e.key == "ArrowDown")  {  moveBaixo    = e.type == "keydown" ?  1 : 0;}
 }
 
 function movimentacaoLogica(player){
 
   //Aplica os vetores direcao
   moveDireita  == 1 ? player.moveX(1,1)  : true ;
-  moveEsquerda == 1 ? player.moveX(-1,1) : true ;  
+  moveEsquerda == 1 ? player.moveX(-1,1) : true ;
+  moveCima     == 1 ? player.moveY(-1,1) : true ;
+  moveBaixo    == 1 ? player.moveY(1,1)  : true ; 
+
 }
 //#endregion
 
@@ -138,6 +120,35 @@ function movimentacaoLogica(player){
 
 
 
+//#region Desenho
+  function desenhaQuadrado(obj){
+
+    ctx.fillStyle = "#aaaaaa";
+    ctx.fillRect(obj.x, obj.y, obj.width, obj.height);
+  }
+
+  function desenha(obj){
+
+    ctx.fillStyle = "#aaaaaa";
+    ctx.fillRect( obj.x, obj.y, obj.width, obj.height);
+  }
+
+  function limpaTela(){
+
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+  }
+
+  function draw() {
+
+    movimentacaoLogica(player);
+
+    limpaTela(); 
+    desenha(player);
+
+    window.requestAnimationFrame(draw);
+  }
+//#endregion
+
 </script>
 
 
@@ -159,6 +170,7 @@ function movimentacaoLogica(player){
     //alguma animacao de ataque
     //se conseguir duas animacoes de atq versionar
     //rn - precisa tirar nota em provas escrita e pratia pra ir ranked
+    //bug com tres teclas
     // const element = document.querySelector("textarea"),
     //   ArrowRight = k => {
     //      console.log(k);
@@ -188,6 +200,17 @@ function movimentacaoLogica(player){
     //nao funciona pois os valores estao no atributo inves do style
     //canvasHeight = document.getElementById("canvas").style.height;
     //canvasWidth = document.getElementById("canvas").style.width;
+
+
+
+    //#region Logica de Codigo
+    //Logica de Teclas
+    ///Uma tecla qndo apertado é registrada na secao event listener, depois o notificador usa
+    //a funcao adequada dependendo do tipo de evento na secao movimentacao logica
+    //nisso apenas a direcao e setado, ficando a cargo do loop iterar a movimentacao toda vez 
+    //por ultimo o desenho apenas pega os dados e desenha
+    //#endregion
+
 
 </script>
 
