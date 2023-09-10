@@ -20,6 +20,12 @@
     var moveEsquerda = 0;
     var player = 0;
 
+    var teclaPressionada;
+    var teclaLiberada;
+
+    var notificaDown;
+    var notificaDown;
+
 
 
     //classes
@@ -31,110 +37,110 @@
         this.width = width;
         this.height = height;
       }
-
-      moveX(dist, interensidade){
-        var intensidade = intensidade ? intensidade : 1;
-        this.x = this.x + dist*intensidade;
+      
+      moveX(dist, intensidade){
+        this.x = this.x + dist * (intensidade ? intensidade : 1);
       }
-
+    
     }
 
 
-
-
-
-function init(){
-
-    console.log("iniciou");
-    //canvasHeight = document.getElementById("canvas").style.height;
-    canvasHeight = document.getElementById("canvas").getAttribute("height");
-    //canvasWidth = document.getElementById("canvas").style.width;
-    canvasWidth = document.getElementById("canvas").getAttribute("width");
-    ctx = document.getElementById("canvas").getContext("2d");
-
-
-    player = new Quadrado(10, 10, 10, 10);
-
-
-    window.requestAnimationFrame(draw);
-}
-
-
-
 //#region Desenho
-//====================Desenho============================
-
-  function desenhaQuadrado(){
+  function desenhaQuadrado(obj){
 
       ctx.fillStyle = "#aaaaaa";
-      ctx.fillRect(10 + coordX, 10, 10, 10);
+      ctx.fillRect(obj.x, obj.y, obj.width, obj.height);
   }
-
+  
   function desenha(obj){
 
       ctx.fillStyle = "#aaaaaa";
       ctx.fillRect( obj.x, obj.y, obj.width, obj.height);
   }
+  
+  function limpaTela(){
 
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+  }
+  
   function draw() {
 
-
-    if(moveDireita == 1){
-        player.moveX(1,1)
-    }
-    if(moveEsquerda == 1){
-        player.moveX(-1,1);
-    }
+    movimentacaoLogica(player);
 
     limpaTela(); 
     desenha(player);
 
     window.requestAnimationFrame(draw);
   }
-
-  function limpaTela(){
-
-    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-  }
-
-//=====================================================
 //#endregion
 
-//#region Teclado
-//======================Teclado=======================
 
-document.addEventListener("keydown", function(event) {
-  if (event.key == "ArrowRight") {
-    moveDireita = 1;
-  }
 
-  if (event.key == "ArrowLeft") {
-    moveEsquerda = 1;
-  }
-});
 
-document.addEventListener("keyup", function(event) {
-  if (event.key == "ArrowRight") {
-    moveDireita = 0;
-  }
+//#region Init Settings
+function initCanvasContextSettings(){
 
-  if (event.key == "ArrowLeft") {
-    moveEsquerda = 0;
-  }
-});
+    canvasHeight = document.getElementById("canvas").getAttribute("height");
+    canvasWidth = document.getElementById("canvas").getAttribute("width");
+    ctx = document.getElementById("canvas").getContext("2d");
+}
 
-//====================================================
+function init(){
+
+  //varaives padrao canvas
+  initCanvasContextSettings();
+
+  //inicializa o player, talvez os demais elementos e players
+  player = new Quadrado(10, 10, 10, 10);
+
+  //starta o loop de animacao
+  window.requestAnimationFrame(draw);
+}
 //#endregion
 
-//#region
-//=======================Start=======================
 
-window.addEventListener('load', init);
 
-//===================================================
+
+//#region Movimentacao logica
+//sao dois sinais apenas por enquanto, down e up
+function setaVetoresDirecao(player, e){
+
+  //Seta os vetores direcao
+  //Como só tem keydown ou keyup deu pra fazer o ternario
+  if( e.key == "ArrowRight") {  moveDireita  = e.type == "keydown" ?  1 : 0;}
+  if( e.key == "ArrowLeft")  {  moveEsquerda = e.type == "keydown" ?  1 : 0;}
+}
+
+function movimentacaoLogica(player){
+
+  //Aplica os vetores direcao
+  moveDireita  == 1 ? player.moveX(1,1)  : true ;
+  moveEsquerda == 1 ? player.moveX(-1,1) : true ;  
+}
+//#endregion
+
+
+
+
+//#region Event Listenners e Notificacoes
+  document.addEventListener("keydown", function(event) {notifica(event);});
+  document.addEventListener("keyup", function(event)   {notifica(event);});
+  window.addEventListener('load', init);
+
+  function notifica(e){
+
+    if(e.type == "keydown"){ setaVetoresDirecao(player, e)}
+    if(e.type == "keyup")  { setaVetoresDirecao(player, e)}
+
+  }
+//#endregion
+
+
 
 
 </script>
+
+
 
 
 
@@ -178,6 +184,11 @@ window.addEventListener('load', init);
     //         handler[k](k);
     //      }
     //   });
+
+    //nao funciona pois os valores estao no atributo inves do style
+    //canvasHeight = document.getElementById("canvas").style.height;
+    //canvasWidth = document.getElementById("canvas").style.width;
+
 </script>
 
 
