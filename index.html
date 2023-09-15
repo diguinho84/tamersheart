@@ -25,10 +25,7 @@
     var teclaPressionada;
     var teclaLiberada;
 
-    var notificaDown;
-    var notificaDown;
-
-
+    var elementosMapa = [];
 
 
     //classes
@@ -39,8 +36,44 @@
         this.y = y;
         this.width = width;
         this.height = height;
+        this.xm = x + (width/2);
+        this.ym = y + (height/2);
       }
-      
+    }
+
+    class Circulo{
+
+      constructor(x, y, raio){
+        this.x = x,
+        this.y = y,
+        this.raio = raio,
+        this.center = {x: this.x, y: this.y}
+      }
+    }
+
+    class Ponto{
+
+      constructor( x, y){
+
+        this.x = x,
+        this.y = y
+      }
+    }
+    
+    class Player{
+
+      constructor(obj){
+        this.x = obj.x;
+        this.y = obj.y;
+        this.width = obj.width;
+        this.height = obj.height;
+        this.xm = this.x + (this.width/2);
+        this.ym = this.y + (this.height/2);
+        this.quadrado = new Quadrado(this.x, this.y, this.width, this.height),
+        this.circulo = new Circulo(this.x , this.y, 
+          dist( new Ponto(this.x, this.y), new Ponto(this.xm, this.ym) ) )
+      }
+
       moveX(dist, intensidade){
         this.x = this.x + dist * (intensidade ? intensidade : 1);
       }
@@ -48,8 +81,8 @@
       moveY(dist, intensidade){
         this.y = this.y + dist * (intensidade ? intensidade : 1);
       }
-    
     }
+
 
 
 
@@ -68,7 +101,9 @@ function init(){
   initCanvasContextSettings();
 
   //inicializa o player, talvez os demais elementos e players
-  player = new Quadrado(10, 10, 10, 10);
+  player = new Player({x: 10, y:150, width:10, height:10});
+
+  elementosMapa[0] = new Player({x: 50, y:150, width:10, height:10})
 
   //starta o loop de animacao
   window.requestAnimationFrame(draw);
@@ -93,11 +128,35 @@ function setaVetoresDirecao(player, e){
 function movimentacaoLogica(player){
 
   //Aplica os vetores direcao
-  moveDireita  == 1 ? player.moveX(1,1)  : true ;
-  moveEsquerda == 1 ? player.moveX(-1,1) : true ;
-  moveCima     == 1 ? player.moveY(-1,1) : true ;
-  moveBaixo    == 1 ? player.moveY(1,1)  : true ; 
+  moveDireita  == 1 ? tryMove(player, "x", 1, 1)  : true ;
+  moveEsquerda == 1 ? tryMove(player, "x", -1, 1) : true ;
+  moveCima     == 1 ? tryMove(player, "y", -1, 1) : true ;
+  moveBaixo    == 1 ? tryMove(player, "y", 1, 1)  : true ; 
+}
 
+function tryMove(player, f, u1, u2){
+
+  var projecaoPlayer = new Player(player);
+  if(f == "x"){ 
+    projecaoPlayer.moveX(u1, u2);
+    if(!colisao2dCirculo(projecaoPlayer.circulo, elementosMapa[0].circulo)){
+      player.moveX(u1, u2);
+    }
+  }
+  
+}
+
+function colisao2dCirculo( bolaA, bolaB ){ 
+  
+  var result = dist(bolaA.center, bolaB.center) <= (bolaA.raio + bolaB.raio)
+  console.log(dist(bolaA.center, bolaB.center));
+  console.log(bolaA.raio + bolaB.raio)
+  return result;
+}
+
+function dist(pontoA, pontoB){
+
+  return Math.pow( ((pontoA.x - pontoB.x)**2 + (pontoA.y - pontoB.y)**2), 0.5 );
 }
 //#endregion
 
@@ -144,6 +203,7 @@ function movimentacaoLogica(player){
 
     limpaTela(); 
     desenha(player);
+    desenha(elementosMapa[0]);
 
     window.requestAnimationFrame(draw);
   }
@@ -156,12 +216,10 @@ function movimentacaoLogica(player){
 
 
 <script>
-    // ok - colocar alguns objs e possivelmente uma classe
-
-    //facilitar o desenvolvimento
-    //movimentacao simples, colocar pra Y e adequar classes, colisao simples
-    //revisar o codigo, comentar codigo, colcar eixoY, e colisao quadratica
-    //contexto de colisao quadratica
+    
+    //facilitar o desenvolvimento, parece q se o codigo for bom deve ficar facil colocar melhorias
+    //  e continuar
+    //parei aqui - todos os valores abixo de height precisam ser revisados
     //colocar td no js
     //nao vai ter desempenho maximo nem rodar em td por hora
     //ver classes pra ja colocar
@@ -171,6 +229,11 @@ function movimentacaoLogica(player){
     //se conseguir duas animacoes de atq versionar
     //rn - precisa tirar nota em provas escrita e pratia pra ir ranked
     //bug com tres teclas
+
+
+    //ok - movimentacao simples, colocar pra Y e adequar classes, colisao simples
+    //ok - colocar alguns objs e possivelmente uma classe
+
     // const element = document.querySelector("textarea"),
     //   ArrowRight = k => {
     //      console.log(k);
