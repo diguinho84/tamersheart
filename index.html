@@ -36,29 +36,38 @@
         this.y = y;
         this.width = width;
         this.height = height;
-        this.xm = x + (width/2);
-        this.ym = y + (height/2);
+        // this.xm = x + (width/2);
+        // this.ym = y + (height/2);
       }
+
+      getXm(){ return this.x + (width/2) }
+      getYm(){ return this.x + (width/2) }
+      getPontoMedio(){ return {xm: getXm(), ym: getYm()} }
+    
     }
 
     class Circulo{
 
       constructor(x, y, raio){
-        this.x = x,
-        this.y = y,
-        this.raio = raio,
-        this.center = {x: this.x, y: this.y}
+        this.x = x;
+        this.y = y;
+        this.raio = raio;
+        // this.raio = raio,
+        // this.center = {x: this.x, y: this.y}
       }
+
+      getCenter(){ return {x: this.x, y: this.y} }
+      getRaio(){ return this.raio; }
     }
 
-    class Ponto{
+    // class Ponto{
 
-      constructor( x, y){
+    //   constructor( x, y){
 
-        this.x = x,
-        this.y = y
-      }
-    }
+    //     this.x = x,
+    //     this.y = y
+    //   }
+    // }
     
     class Player{
 
@@ -67,11 +76,11 @@
         this.y = obj.y;
         this.width = obj.width;
         this.height = obj.height;
-        this.xm = this.x + (this.width/2);
-        this.ym = this.y + (this.height/2);
-        this.quadrado = new Quadrado(this.x, this.y, this.width, this.height),
-        this.circulo = new Circulo(this.x , this.y, 
-          dist( new Ponto(this.x, this.y), new Ponto(this.xm, this.ym) ) )
+        // this.xm = this.x + (this.width/2);
+        // this.ym = this.y + (this.height/2);
+        // this.quadrado = new Quadrado(this.x, this.y, this.width, this.height),
+        // this.circulo = new Circulo(this.x , this.y, 
+        //   dist( new Ponto(this.x, this.y), new Ponto(this.xm, this.ym) ) )
       }
 
       moveX(dist, intensidade){
@@ -81,6 +90,12 @@
       moveY(dist, intensidade){
         this.y = this.y + dist * (intensidade ? intensidade : 1);
       }
+
+      getXm(){ return this.x + (this.width/2) }
+      getYm(){ return this.x + (this.width/2) }
+      getPontoMedio(){ return {xm: this.getXm(), ym: this.getYm()} }
+      getRaio(){ return raio( (this.width/2) , (this.height/2) ) }
+      getCirculo(){ return new Circulo(this.x, this.y, this.getRaio())}
     }
 
 
@@ -139,7 +154,7 @@ function tryMove(player, f, u1, u2){
   var projecaoPlayer = new Player(player);
   if(f == "x"){ 
     projecaoPlayer.moveX(u1, u2);
-    if(!colisao2dCirculo(projecaoPlayer.circulo, elementosMapa[0].circulo)){
+    if(!colisao2dCirculo(projecaoPlayer.getCirculo(), elementosMapa[0].getCirculo())){
       player.moveX(u1, u2);
     }
   }
@@ -148,9 +163,9 @@ function tryMove(player, f, u1, u2){
 
 function colisao2dCirculo( bolaA, bolaB ){ 
   
-  var result = dist(bolaA.center, bolaB.center) <= (bolaA.raio + bolaB.raio)
-  console.log(dist(bolaA.center, bolaB.center));
-  console.log(bolaA.raio + bolaB.raio)
+  var result = dist(bolaA.getCenter(), bolaB.getCenter()) <= (bolaA.getRaio() + bolaB.getRaio())
+  console.log(dist(bolaA.getCenter(), bolaB.getCenter()));
+  console.log(bolaA.getRaio() + bolaB.getRaio())
   return result;
 }
 
@@ -209,6 +224,22 @@ function dist(pontoA, pontoB){
   }
 //#endregion
 
+
+
+
+//#region Math
+
+function raio(ladoA, ladoB){ 
+  return Math.pow( ((ladoA)**2 + (ladoB)**2), 0.5 ) 
+}
+
+function distancia(A, B){
+
+  return Math.pow( ((A.x - B.x)**2 + (A.y - B.y)**2), 0.5 )
+}
+
+//#endregion
+
 </script>
 
 
@@ -217,6 +248,7 @@ function dist(pontoA, pontoB){
 
 <script>
     
+    //talvez o raio medio entre o raio externo e o interno
     //facilitar o desenvolvimento, parece q se o codigo for bom deve ficar facil colocar melhorias
     //  e continuar
     //parei aqui - todos os valores abixo de height precisam ser revisados
