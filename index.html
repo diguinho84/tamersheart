@@ -152,10 +152,18 @@ function movimentacaoLogica(player){
 function tryMove(player, f, u1, u2){
 
   var projecaoPlayer = new Player(player);
+  
   if(f == "x"){ 
     projecaoPlayer.moveX(u1, u2);
     if(!colisao2dCirculo(projecaoPlayer.getCirculo(), elementosMapa[0].getCirculo())){
       player.moveX(u1, u2);
+    }
+  }
+
+  if(f == "y"){ 
+    projecaoPlayer.moveY(u1, u2);
+    if(!colisao2dCirculo(projecaoPlayer.getCirculo(), elementosMapa[0].getCirculo())){
+      player.moveY(u1, u2);
     }
   }
   
@@ -248,9 +256,9 @@ function distancia(A, B){
 
 <script>
     
-    //talvez o raio medio entre o raio externo e o interno
     //facilitar o desenvolvimento, parece q se o codigo for bom deve ficar facil colocar melhorias
     //  e continuar
+    //fisica simuladada com acoes de pulo, e acoes proprias da raça, ataques, logica de dano
     //todos os valores abixo de height precisam ser revisados
     //colocar td no js
     //nao vai ter desempenho maximo nem rodar em td por hora
@@ -260,6 +268,7 @@ function distancia(A, B){
     //alguma animacao de ataque
     //se conseguir duas animacoes de atq versionar
     //rn - precisa tirar nota em provas escrita e pratia pra ir ranked
+    //talvez o raio medio entre o raio externo e o interno
     //bug com tres teclas
 
 
