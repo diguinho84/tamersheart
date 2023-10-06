@@ -26,6 +26,8 @@
     var teclaLiberada;
 
     var elementosMapa = [];
+    var gravitaveis = [];
+
 
 
     //classes
@@ -119,6 +121,8 @@ function init(){
   player = new Player({x: 10, y:150, width:10, height:10});
 
   elementosMapa[0] = new Player({x: 50, y:150, width:10, height:10})
+  elementosMapa[1] = new Player({x: 70, y:150, width:10, height:10})
+  elementosMapa[2] = new Player({x: 90, y:120, width:10, height:10})
 
   //starta o loop de animacao
   window.requestAnimationFrame(draw);
@@ -155,14 +159,14 @@ function tryMove(player, f, u1, u2){
   
   if(f == "x"){ 
     projecaoPlayer.moveX(u1, u2);
-    if(!colisao2dCirculo(projecaoPlayer.getCirculo(), elementosMapa[0].getCirculo())){
+    if(!colisaoComAlgumElementoMapa(projecaoPlayer, elementosMapa)){
       player.moveX(u1, u2);
     }
   }
 
   if(f == "y"){ 
     projecaoPlayer.moveY(u1, u2);
-    if(!colisao2dCirculo(projecaoPlayer.getCirculo(), elementosMapa[0].getCirculo())){
+    if(!colisaoComAlgumElementoMapa(projecaoPlayer, elementosMapa)){
       player.moveY(u1, u2);
     }
   }
@@ -177,10 +181,31 @@ function colisao2dCirculo( bolaA, bolaB ){
   return result;
 }
 
+function colisaoComAlgumElementoMapa(projecaoPlayer, elementos){
+
+  console.log(projecaoPlayer.getCirculo().getRaio() + " " + elementos[0].getCirculo().getRaio());
+  for(var i = 0; i < elementos.length; i++){
+    console.log(projecaoPlayer.getCirculo() + " " + elementos[i].getCirculo());
+    if(colisao2dCirculo(projecaoPlayer.getCirculo(), elementos[i].getCirculo())){
+      return 1;
+    }
+  }
+
+  return 0;
+}
+
+function colisaoComGround(){}
+
 function dist(pontoA, pontoB){
 
   return Math.pow( ((pontoA.x - pontoB.x)**2 + (pontoA.y - pontoB.y)**2), 0.5 );
 }
+
+// function aplicaGravidade(player){
+
+//   tryMove(player, "y", 1, 1);
+// }
+
 //#endregion
 
 
@@ -226,7 +251,7 @@ function dist(pontoA, pontoB){
 
     limpaTela(); 
     desenha(player);
-    desenha(elementosMapa[0]);
+    elementosMapa.forEach((elemento) => desenha(elemento));
 
     window.requestAnimationFrame(draw);
   }
@@ -258,7 +283,7 @@ function distancia(A, B){
     
     //facilitar o desenvolvimento, parece q se o codigo for bom deve ficar facil colocar melhorias
     //  e continuar
-    //fisica simuladada com acoes de pulo, e acoes proprias da raça, ataques, logica de dano
+    //pareio aqui - fisica simuladada com acoes de pulo, e acoes proprias da raça, ataques, logica de dano
     //todos os valores abixo de height precisam ser revisados
     //colocar td no js
     //nao vai ter desempenho maximo nem rodar em td por hora
