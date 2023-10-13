@@ -21,12 +21,14 @@
     var moveCima = 0;
     var moveBaixo = 0;
     var player = 0;
+    var alturaDefault = 150;
 
     var teclaPressionada;
     var teclaLiberada;
 
     var elementosMapa = [];
     var gravitaveis = [];
+    var grounds = [];
 
 
 
@@ -96,7 +98,7 @@
       getXm(){ return this.x + (this.width/2) }
       getYm(){ return this.x + (this.width/2) }
       getPontoMedio(){ return {xm: this.getXm(), ym: this.getYm()} }
-      getRaio(){ return raio( (this.width/2) , (this.height/2) ) }
+      getRaio(){ return this.width/2 }
       getCirculo(){ return new Circulo(this.x, this.y, this.getRaio())}
     }
 
@@ -107,8 +109,8 @@
 //#region Init Settings
 function initCanvasContextSettings(){
 
-    canvasHeight = document.getElementById("canvas").getAttribute("height");
-    canvasWidth = document.getElementById("canvas").getAttribute("width");
+    canvasHeight = Number.parseInt(document.getElementById("canvas").getAttribute("height"));
+    canvasWidth = Number.parseInt(document.getElementById("canvas").getAttribute("width"));
     ctx = document.getElementById("canvas").getContext("2d");
 }
 
@@ -118,11 +120,14 @@ function init(){
   initCanvasContextSettings();
 
   //inicializa o player, talvez os demais elementos e players
-  player = new Player({x: 10, y:150, width:10, height:10});
+  player = new Player({x: 10, y:alturaDefault -10, width:10, height:10});
 
-  elementosMapa[0] = new Player({x: 50, y:150, width:10, height:10})
-  elementosMapa[1] = new Player({x: 70, y:150, width:10, height:10})
+  elementosMapa[0] = new Player({x: 50, y:alturaDefault -10, width:10, height:10})
+  elementosMapa[1] = new Player({x: 70, y:alturaDefault -10, width:10, height:10})
   elementosMapa[2] = new Player({x: 90, y:120, width:10, height:10})
+
+  grounds[0] = new Quadrado(0, alturaDefault, canvasWidth, canvasHeight/4)
+  gravitaveis[0] = player;
 
   //starta o loop de animacao
   window.requestAnimationFrame(draw);
@@ -173,11 +178,12 @@ function tryMove(player, f, u1, u2){
   
 }
 
+//tive q usar logica complicada pois é complicado ser atrapalhado toda hora
 function colisao2dCirculo( bolaA, bolaB ){ 
   
   var result = dist(bolaA.getCenter(), bolaB.getCenter()) <= (bolaA.getRaio() + bolaB.getRaio())
   console.log(dist(bolaA.getCenter(), bolaB.getCenter()));
-  console.log(bolaA.getRaio() + bolaB.getRaio())
+  console.log(bolaA.getCenter() + " " + bolaB.getCenter())
   return result;
 }
 
@@ -185,16 +191,31 @@ function colisaoComAlgumElementoMapa(projecaoPlayer, elementos){
 
   console.log(projecaoPlayer.getCirculo().getRaio() + " " + elementos[0].getCirculo().getRaio());
   for(var i = 0; i < elementos.length; i++){
-    console.log(projecaoPlayer.getCirculo() + " " + elementos[i].getCirculo());
+    console.log(projecaoPlayer.getCirculo().getRaio() + " " + elementos[i].getCirculo().getRaio());
     if(colisao2dCirculo(projecaoPlayer.getCirculo(), elementos[i].getCirculo())){
       return 1;
     }
   }
 
+  if(colisaoComGround(projecaoPlayer, grounds)){
+
+    return 1;
+  }
+
+
   return 0;
 }
 
-function colisaoComGround(){}
+function colisaoComGround(player, grounds){
+
+  for(var i = 0; i < grounds.length; i++ ){
+    if( (player.y + player.height ) > grounds[i].y ){
+      return 1;
+    }
+  } 
+
+  return 0;
+}
 
 function dist(pontoA, pontoB){
 
@@ -251,6 +272,7 @@ function dist(pontoA, pontoB){
 
     limpaTela(); 
     desenha(player);
+    desenha(grounds[0]);
     elementosMapa.forEach((elemento) => desenha(elemento));
 
     window.requestAnimationFrame(draw);
@@ -287,7 +309,7 @@ function distancia(A, B){
     //todos os valores abixo de height precisam ser revisados
     //colocar td no js
     //nao vai ter desempenho maximo nem rodar em td por hora
-    //ver classes pra ja colocar
+    //ok -ver classes pra ja colocar
     //colocar contexto de posicionamento e colisao
     //contexto de bitmap
     //alguma animacao de ataque
