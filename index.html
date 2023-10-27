@@ -22,6 +22,7 @@
     var moveBaixo = 0;
     var player = 0;
     var alturaDefault = 150;
+    var pula = 0;
 
     var teclaPressionada;
     var teclaLiberada;
@@ -40,8 +41,6 @@
         this.y = y;
         this.width = width;
         this.height = height;
-        // this.xm = x + (width/2);
-        // this.ym = y + (height/2);
       }
 
       getXm(){ return this.x + (width/2) }
@@ -56,22 +55,12 @@
         this.x = x;
         this.y = y;
         this.raio = raio;
-        // this.raio = raio,
-        // this.center = {x: this.x, y: this.y}
       }
 
       getCenter(){ return {x: this.x, y: this.y} }
       getRaio(){ return this.raio; }
     }
 
-    // class Ponto{
-
-    //   constructor( x, y){
-
-    //     this.x = x,
-    //     this.y = y
-    //   }
-    // }
     
     class Player{
 
@@ -80,30 +69,49 @@
         this.y = obj.y;
         this.width = obj.width;
         this.height = obj.height;
-        // this.xm = this.x + (this.width/2);
-        // this.ym = this.y + (this.height/2);
-        // this.quadrado = new Quadrado(this.x, this.y, this.width, this.height),
-        // this.circulo = new Circulo(this.x , this.y, 
-        //   dist( new Ponto(this.x, this.y), new Ponto(this.xm, this.ym) ) )
+        this.pulo = new Pulo({stacks: 0, cima: 0, baixo: 0});
       }
-
-      moveX(dist, intensidade){
-        this.x = this.x + dist * (intensidade ? intensidade : 1);
-      }
-
-      moveY(dist, intensidade){
-        this.y = this.y + dist * (intensidade ? intensidade : 1);
-      }
-
+      
       getXm(){ return this.x + (this.width/2) }
       getYm(){ return this.x + (this.width/2) }
       getPontoMedio(){ return {xm: this.getXm(), ym: this.getYm()} }
       getRaio(){ return this.width/2 }
       getCirculo(){ return new Circulo(this.x, this.y, this.getRaio())}
+      
     }
 
 
+    class Pulo{
+      
+      constructor(obj){
+        this.stacks = obj.stacks;
+        this.cima = obj.cima;
+        this.baixo = obj.baixo;
+      }
 
+      performa(player){
+
+        if(this.cima > 0){
+          if( (tryMove(player, "y", -1, 1))){
+            this.cima--
+          }else{
+            this.cima = 0;
+          }
+        }else{
+          // if(this.baixo > 0){
+          //   if( (tryMove(player, "y", 1, 1))){
+          //     this.baixo--
+          //   }else{
+          //     this.baixo = 0;
+          //   }
+          // }else{
+          //   this.stacks = 0;
+          // }
+          this.stacks = 0;
+        }
+      }
+
+    }
 
     
 //#region Init Settings
@@ -143,10 +151,11 @@ function setaVetoresDirecao(player, e){
 
   //Seta os vetores direcao
   //Como só tem keydown ou keyup deu pra fazer o ternario
-  if( e.key == "ArrowRight") {  moveDireita  = e.type == "keydown" ?  1 : 0;}
-  if( e.key == "ArrowLeft")  {  moveEsquerda = e.type == "keydown" ?  1 : 0;}
-  if( e.key == "ArrowUp")    {  moveCima     = e.type == "keydown" ?  1 : 0;}
-  if( e.key == "ArrowDown")  {  moveBaixo    = e.type == "keydown" ?  1 : 0;}
+  if( e.key == "ArrowRight")         {  moveDireita  = e.type == "keydown" ?  1 : 0;}
+  if( e.key == "ArrowLeft")          {  moveEsquerda = e.type == "keydown" ?  1 : 0;}
+  if( e.key == "ArrowUp")            {  moveCima     = e.type == "keydown" ?  1 : 0;}
+  if( e.key == "ArrowDown")          {  moveBaixo    = e.type == "keydown" ?  1 : 0;}
+  if( e.key == "a" || e.key == "A")  {  pula         = e.type == "keydown" ?  1 : 0;}
 }
 
 function movimentacaoLogica(player){
@@ -155,7 +164,21 @@ function movimentacaoLogica(player){
   moveDireita  == 1 ? tryMove(player, "x", 1, 1)  : true ;
   moveEsquerda == 1 ? tryMove(player, "x", -1, 1) : true ;
   moveCima     == 1 ? tryMove(player, "y", -1, 1) : true ;
-  moveBaixo    == 1 ? tryMove(player, "y", 1, 1)  : true ; 
+  moveBaixo    == 1 ? tryMove(player, "y", 1, 1)  : true ;
+  
+  // if( pula == 1 && player.pulo.stacks < 2  ){
+  //   player.pulo.stacks++;
+  //   player.pulo.cima = 3;
+  //   player.pulo.baixo = 3;
+  // }
+
+  if( pula == 1 && player.pulo.stacks < 2  ){
+    player.pulo.stacks++;
+    player.pulo.cima = 20;
+  }
+
+  player.pulo.performa(player);
+  
 }
 
 function tryMove(player, f, u1, u2){
@@ -163,20 +186,60 @@ function tryMove(player, f, u1, u2){
   var projecaoPlayer = new Player(player);
   
   if(f == "x"){ 
-    projecaoPlayer.moveX(u1, u2);
+    moveX(projecaoPlayer, u1, u2);
     if(!colisaoComAlgumElementoMapa(projecaoPlayer, elementosMapa)){
       player.moveX(u1, u2);
+    }else{
+      return 0;
     }
   }
 
   if(f == "y"){ 
-    projecaoPlayer.moveY(u1, u2);
+    moveY(projecaoPlayer, u1, u2);
     if(!colisaoComAlgumElementoMapa(projecaoPlayer, elementosMapa)){
       player.moveY(u1, u2);
+    }else{
+      return 0;
     }
   }
   
+  return 1;
 }
+
+// function tryMoveSmooth(){
+
+//   var projecaoPlayer = new Player(player);
+  
+//   if(f == "x"){ 
+//     projecaoPlayer.moveX(u1, u2);
+//     if(!colisaoComAlgumElementoMapa(projecaoPlayer, elementosMapa)){
+//       player.moveX(u1, u2);
+//     }else{
+//       return 0;
+//     }
+//   }
+
+//   if(f == "y"){ 
+//     projecaoPlayer.moveY(u1, u2);
+//     if(!colisaoComAlgumElementoMapa(projecaoPlayer, elementosMapa)){
+//       player.moveY(u1, u2);
+//     }else{
+//       return 0;
+//     }
+//   }
+  
+//   return 1;
+
+// }
+
+function moveX(elemento, d, intensidade){
+  elemento.x = elemento.x + d * (intensidade ? intensidade : 1);
+}
+
+function moveY(elemento, d, intensidade){
+  elemento.y = elemento.y + d * (intensidade ? intensidade : 1);
+}
+
 
 //tive q usar logica complicada pois é complicado ser atrapalhado toda hora
 function colisao2dCirculo( bolaA, bolaB ){ 
@@ -187,17 +250,34 @@ function colisao2dCirculo( bolaA, bolaB ){
   return result;
 }
 
+function colisao2dQuadratica( quadradoA, quadradoB){
+
+  if()
+}
+
+function inRange( a , b){
+
+  if( ( (a.x + a.width < b.x ) ) || ((a.x > b.x + b.width)) ){
+    return 0;
+  }else{
+    if(( (a.y + a.height < b.y ) ) || ((a.y > b.y + b.height))){
+      return 0;
+    }
+  }
+
+  return 1;
+}
+
+
 function colisaoComAlgumElementoMapa(projecaoPlayer, elementos){
 
-  console.log(projecaoPlayer.getCirculo().getRaio() + " " + elementos[0].getCirculo().getRaio());
   for(var i = 0; i < elementos.length; i++){
-    console.log(projecaoPlayer.getCirculo().getRaio() + " " + elementos[i].getCirculo().getRaio());
     if(colisao2dCirculo(projecaoPlayer.getCirculo(), elementos[i].getCirculo())){
       return 1;
     }
   }
 
-  if(colisaoComGround(projecaoPlayer, grounds)){
+  if(colisaoComGroundable(projecaoPlayer, grounds)){
 
     return 1;
   }
@@ -206,15 +286,24 @@ function colisaoComAlgumElementoMapa(projecaoPlayer, elementos){
   return 0;
 }
 
-function colisaoComGround(player, grounds){
+// function colisaoComGround(player, grounds){
 
-  for(var i = 0; i < grounds.length; i++ ){
-    if( (player.y + player.height ) > grounds[i].y ){
-      return 1;
-    }
-  } 
+//   for(var i = 0; i < grounds.length; i++ ){
+//     if( (player.y + player.height ) > grounds[i].y ){
+//       return 1;
+//     }
+//   } 
 
-  return 0;
+//   return 0;
+// }
+
+function colisaoComGroundable(player, grounds){
+  
+}
+
+function isOnGround(){
+
+    
 }
 
 function dist(pontoA, pontoB){
@@ -222,10 +311,11 @@ function dist(pontoA, pontoB){
   return Math.pow( ((pontoA.x - pontoB.x)**2 + (pontoA.y - pontoB.y)**2), 0.5 );
 }
 
-// function aplicaGravidade(player){
+function aplicaGravidade(){
 
-//   tryMove(player, "y", 1, 1);
-// }
+  gravitaveis.forEach( elemento => {tryMove(elemento, "y", 1, 1)} )
+  //tryMove(player, "y", 1, 1);
+}
 
 //#endregion
 
@@ -269,6 +359,7 @@ function dist(pontoA, pontoB){
   function draw() {
 
     movimentacaoLogica(player);
+    aplicaGravidade();
 
     limpaTela(); 
     desenha(player);
