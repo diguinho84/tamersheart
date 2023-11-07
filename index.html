@@ -72,7 +72,6 @@
         this.y = obj.y;
         this.width = obj.width;
         this.height = obj.height;
-        this.pulo = new Pulo({stacks: 0, cima: 0, baixo: 0});
       }
       
       getXm(){ return this.x + (this.width/2) }
@@ -95,22 +94,21 @@
       performa(player){
 
         if(this.cima > 0){
-          if( (tryMove(player, "y", -1, 1))){
+          if( (tryMove(player, "y", -1, distPadrao))){
             this.cima--
           }else{
             this.cima = 0;
           }
         }else{
-          // if(this.baixo > 0){
-          //   if( (tryMove(player, "y", 1, 1))){
-          //     this.baixo--
-          //   }else{
-          //     this.baixo = 0;
-          //   }
-          // }else{
-          //   this.stacks = 0;
-          // }
-          this.stacks = 0;
+          if(this.baixo > 0){
+            if( (tryMove(player, "y", 1, distPadrao))){
+              this.baixo--;
+            }else{
+              this.baixo = 0;
+            }
+          }else{
+            delete player.pulo;
+          }
         }
       }
 
@@ -175,13 +173,17 @@ function movimentacaoLogica(player){
   //   player.pulo.baixo = 3;
   // }
 
-  if( pula == 1 && player.pulo.stacks < 2  ){
-    player.pulo.stacks++;
-    player.pulo.cima = 20;
+  if( player.pulo !== undefined ) {//&& player.pulo.stacks < 2  ){
+    player.pulo.performa(player);
+    // player.pulo.stacks++;
+    // player.pulo.cima = 20;
+  }else{
+    if(isOnGround(player, grounds) && pula == 1 ){
+      player.pulo = new Pulo({stacks: 0, cima: 3, baixo: 3});
+      player.pulo.performa(player);
+    }
   }
 
-  player.pulo.performa(player);
-  
 }
 
 function tryMove(player, f, u1, u2){
@@ -320,9 +322,14 @@ function colisaoComGroundable(player, grounds){
   return 0;
 }
 
-function isOnGround(){
+function isOnGround(player, grounds){
 
-    
+    var projecaoPlayer = new Player(player);
+    moveY(projecaoPlayer, 1, distPadrao);
+
+    if(colisaoComGroundable(projecaoPlayer, grounds)){
+      return 1;
+    }
 }
 
 function dist(pontoA, pontoB){
