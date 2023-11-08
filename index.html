@@ -25,7 +25,7 @@
     var pula = 0;
 
     var distPadrao = 1;
-    var gravidadePadrao = 0.2;
+    var gravidadePadrao = 1;
 
     var teclaPressionada;
     var teclaLiberada;
@@ -86,7 +86,7 @@
     class Pulo{
       
       constructor(obj){
-        this.stacks = obj.stacks;
+        this.size = obj.size;
         this.cima = obj.cima;
         this.baixo = obj.baixo;
       }
@@ -94,21 +94,22 @@
       performa(player){
 
         if(this.cima > 0){
-          if( (tryMove(player, "y", -1, distPadrao))){
+          if( (tryMove(player, "y", -1, this.size))){
             this.cima--
           }else{
             this.cima = 0;
           }
         }else{
-          if(this.baixo > 0){
-            if( (tryMove(player, "y", 1, distPadrao))){
-              this.baixo--;
-            }else{
-              this.baixo = 0;
-            }
-          }else{
-            delete player.pulo;
-          }
+          // if(this.baixo > 0){
+          //   if( (tryMove(player, "y", 1, distPadrao))){
+          //     this.baixo--;
+          //   }else{
+          //     this.baixo = 0;
+          //   }
+          // }else{
+          //   delete player.pulo;
+          // }
+          delete player.pulo;
         }
       }
 
@@ -134,8 +135,10 @@ function init(){
   elementosMapa[0] = new Player({x: 50, y:alturaDefault -10, width:10, height:10})
   elementosMapa[1] = new Player({x: 70, y:alturaDefault -10, width:10, height:10})
   elementosMapa[2] = new Player({x: 90, y:120, width:10, height:10})
-
-  grounds[0] = new Quadrado(0, alturaDefault, canvasWidth, canvasHeight/4)
+  elementosMapa[3] = new Player({x: 120, y:alturaDefault -10, width:10, height:10})
+  
+  grounds[0] = new Quadrado(0, alturaDefault + 0.01, canvasWidth, canvasHeight/4) // se da altura igual e colisao
+  grounds.push(...elementosMapa);
   gravitaveis[0] = player;
 
   //starta o loop de animacao
@@ -154,9 +157,10 @@ function setaVetoresDirecao(player, e){
   //Como só tem keydown ou keyup deu pra fazer o ternario
   if( e.key == "ArrowRight")         {  moveDireita  = e.type == "keydown" ?  1 : 0;}
   if( e.key == "ArrowLeft")          {  moveEsquerda = e.type == "keydown" ?  1 : 0;}
-  if( e.key == "ArrowUp")            {  moveCima     = e.type == "keydown" ?  1 : 0;}
+  //if( e.key == "ArrowUp")            {  moveCima     = e.type == "keydown" ?  1 : 0;}
   if( e.key == "ArrowDown")          {  moveBaixo    = e.type == "keydown" ?  1 : 0;}
-  if( e.key == "a" || e.key == "A")  {  pula         = e.type == "keydown" ?  1 : 0;}
+  //if( e.key == "a" || e.key == "A")  {  pula         = e.type == "keydown" ?  1 : 0;}
+  if( e.key == "ArrowUp")            {  pula         = e.type == "keydown" ?  1 : 0;}
 }
 
 function movimentacaoLogica(player){
@@ -179,7 +183,7 @@ function movimentacaoLogica(player){
     // player.pulo.cima = 20;
   }else{
     if(isOnGround(player, grounds) && pula == 1 ){
-      player.pulo = new Pulo({stacks: 0, cima: 3, baixo: 3});
+      player.pulo = new Pulo({size: 4, cima: 15, baixo: 0});
       player.pulo.performa(player);
     }
   }
@@ -337,7 +341,7 @@ function dist(pontoA, pontoB){
   return Math.pow( ((pontoA.x - pontoB.x)**2 + (pontoA.y - pontoB.y)**2), 0.5 );
 }
 
-function aplicaGravidade(){
+function aplicaGravidade(gravidadePadrao){
 
   gravitaveis.forEach( elemento => {tryMove(elemento, "y", 1, gravidadePadrao)} )
   //tryMove(player, "y", 1, 1);
@@ -385,8 +389,10 @@ function aplicaGravidade(){
   function draw() {
 
     movimentacaoLogica(player);
-    aplicaGravidade();
 
+    aplicaGravidade(gravidadePadrao);
+    aplicaGravidade(0.75*gravidadePadrao);
+    
     limpaTela(); 
     desenha(player);
     desenha(grounds[0]);
