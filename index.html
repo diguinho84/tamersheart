@@ -72,6 +72,7 @@
         this.y = obj.y;
         this.width = obj.width;
         this.height = obj.height;
+        this.bounced = [];
       }
       
       getXm(){ return this.x + (this.width/2) }
@@ -115,6 +116,24 @@
 
     }
 
+    class Bounce{
+
+      constructor(obj){
+        this.intensidade = obj.intensidade;
+      }
+    }
+
+    class Bounced{
+
+      constructor(obj){
+        this.intensidade = obj.intensidade;
+        this.direction = obj.direction;
+        this.axis = obj.axis;
+        this.iteracoes = obj.iteracoes;
+      }
+    }
+
+    
     
 //#region Init Settings
 function initCanvasContextSettings(){
@@ -130,12 +149,13 @@ function init(){
   initCanvasContextSettings();
 
   //inicializa o player, talvez os demais elementos e players
-  player = new Player({x: 10, y:alturaDefault -10, width:10, height:10});
+  player = new Player({x: 10, y:alturaDefault -15, width:10, height:10});
 
   elementosMapa[0] = new Player({x: 50, y:alturaDefault -10, width:10, height:10})
   elementosMapa[1] = new Player({x: 70, y:alturaDefault -10, width:10, height:10})
   elementosMapa[2] = new Player({x: 90, y:120, width:10, height:10})
   elementosMapa[3] = new Player({x: 120, y:alturaDefault -10, width:10, height:10})
+  elementosMapa[3].bounce = new Bounce({intensidade: 10});
   
   grounds[0] = new Quadrado(0, alturaDefault + 0.01, canvasWidth, canvasHeight/4) // se da altura igual e colisao
   grounds.push(...elementosMapa);
@@ -171,11 +191,6 @@ function movimentacaoLogica(player){
   moveCima     == 1 ? tryMove(player, "y", -1, distPadrao) : true ;
   moveBaixo    == 1 ? tryMove(player, "y", 1, distPadrao)  : true ;
   
-  // if( pula == 1 && player.pulo.stacks < 2  ){
-  //   player.pulo.stacks++;
-  //   player.pulo.cima = 3;
-  //   player.pulo.baixo = 3;
-  // }
 
   if( player.pulo !== undefined ) {//&& player.pulo.stacks < 2  ){
     player.pulo.performa(player);
@@ -188,24 +203,47 @@ function movimentacaoLogica(player){
     }
   }
 
+  // if(player.bounced.length > 0){
+  //   player.bounced.forEach( function(elemento, index, arrayBounced) {
+  //     if(elemento.iteracoes > 0 ){
+  //       elemento.iteracoes--;
+  //       tryMove(player, elemento.axis, elemento.direction, elemento.intensidade);
+  //     }else{
+  //       arrayBounced.spliced(index, 1);
+  //     }
+  //   });
+  //   //player.bounced.iterations--;
+  //   //tryMove(player. player.bounced.axis, player.bounced.direction, player.bounced.intensidade);
+  // }
+
 }
 
 function tryMove(player, f, u1, u2){
 
   var projecaoPlayer = new Player(player);
+  var resultadoColisao;
   
   if(f == "x"){ 
+    
     moveX(projecaoPlayer, u1, u2);
-    if(!colisaoComAlgumElementoMapa(projecaoPlayer, elementosMapa)){
+    resultadoColisao = colisaoComAlgumElementoMapa(projecaoPlayer, elementosMapa);
+
+    if(!resultadoColisao){
       moveX(player, u1, u2);
     }else{
+      // if(resultadoColisao.bounce !== undefined) {
+      //   player.bounced.push(new Bounced({intensidade: resultadoColisao.bounce.intensidade, iteracoes: 5, axis: "x", direction: u1}));
+      // }  
       return 0;
     }
   }
 
   if(f == "y"){ 
+
     moveY(projecaoPlayer, u1, u2);
-    if(!colisaoComAlgumElementoMapa(projecaoPlayer, elementosMapa)){
+    resultadoColisao = colisaoComAlgumElementoMapa(projecaoPlayer, elementosMapa);
+
+    if(!resultadoColisao){
       moveY(player, u1, u2);
     }else{
       return 0;
@@ -281,6 +319,17 @@ function inRange( a , b){
   return 1;
 }
 
+// function aplicaBounce(quadradoA, quadradoB){
+
+//   if(quadradoB.bounce !== undefined){
+//       if(quadradoA.bounced === undefined){
+//         quadradoA.bounced = [new Bounced(quadradoB.bounce)];
+//       }else{
+//         quadraoA.bounced = [...quadradoA.bounced, (new Bounced(quadradoB.bounce))];
+//       }
+//   }
+// }
+
 
 function colisaoComAlgumElementoMapa(projecaoPlayer, elementos){
 
@@ -291,14 +340,21 @@ function colisaoComAlgumElementoMapa(projecaoPlayer, elementos){
   // }
 
   for(var i = 0; i < elementos.length; i++){
-    if(colisao2dQuadratica(projecaoPlayer, elementos[i])){
-      return 1;
+    if(colisao2dQuadratica(projecaoPlayer, elementos[i])){      
+      return elementos[i];
     }
   }
 
-  if(colisaoComGroundable(projecaoPlayer, grounds)){
-    return 1;
+  for(var i = 0; i < grounds.length; i++){
+    if(colisaoComGroundable(projecaoPlayer, grounds[i])){
+      return grounds[i];
+    }
   }
+
+  // var colide = colisaoComGroundable(projecaoPlayer, grounds);
+  // if(colide){
+  //   return colide;
+  // }
 
 
   return 0;
@@ -315,12 +371,10 @@ function colisaoComAlgumElementoMapa(projecaoPlayer, elementos){
 //   return 0;
 // }
 
-function colisaoComGroundable(player, grounds){
+function colisaoComGroundable(player, ground){
     
-  for(var i = 0; i < grounds.length; i++){
-    if(colisao2dQuadratica(player, grounds[i])){
-      return 1;
-    }
+  if(colisao2dQuadratica(player, ground)){
+    return 1;
   }
 
   return 0;
@@ -331,8 +385,13 @@ function isOnGround(player, grounds){
     var projecaoPlayer = new Player(player);
     moveY(projecaoPlayer, 1, distPadrao);
 
-    if(colisaoComGroundable(projecaoPlayer, grounds)){
-      return 1;
+    // if(colisaoComGroundable(projecaoPlayer, grounds)){
+    //   return 1;
+    // }
+    for(var i = 0; i < grounds.length; i++){
+      if(colisaoComGroundable(projecaoPlayer, grounds[i])){
+        return grounds[i];
+      }
     }
 }
 
@@ -345,6 +404,13 @@ function aplicaGravidade(gravidadePadrao){
 
   gravitaveis.forEach( elemento => {tryMove(elemento, "y", 1, gravidadePadrao)} )
   //tryMove(player, "y", 1, 1);
+}
+
+function makeBounceable(obj, intensidade){
+
+  if(obj.bounce === undefined){
+    obj.bounce = new Bounce(intensidade);
+  }
 }
 
 //#endregion
@@ -391,7 +457,8 @@ function aplicaGravidade(gravidadePadrao){
     movimentacaoLogica(player);
 
     aplicaGravidade(gravidadePadrao);
-    aplicaGravidade(0.75*gravidadePadrao);
+    aplicaGravidade(0.7*gravidadePadrao);
+    //aplicaGravidade(0.75*gravidadePadrao);
     
     limpaTela(); 
     desenha(player);
