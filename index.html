@@ -155,7 +155,7 @@ function init(){
   elementosMapa[1] = new Player({x: 70, y:alturaDefault -10, width:10, height:10})
   elementosMapa[2] = new Player({x: 90, y:120, width:10, height:10})
   elementosMapa[3] = new Player({x: 120, y:alturaDefault -10, width:10, height:10})
-  elementosMapa[3].bounce = new Bounce({intensidade: 10});
+  elementosMapa[0].bounce = new Bounce({intensidade: 10});
   
   grounds[0] = new Quadrado(0, alturaDefault + 0.01, canvasWidth, canvasHeight/4) // se da altura igual e colisao
   grounds.push(...elementosMapa);
@@ -203,18 +203,21 @@ function movimentacaoLogica(player){
     }
   }
 
-  // if(player.bounced.length > 0){
-  //   player.bounced.forEach( function(elemento, index, arrayBounced) {
-  //     if(elemento.iteracoes > 0 ){
-  //       elemento.iteracoes--;
-  //       tryMove(player, elemento.axis, elemento.direction, elemento.intensidade);
-  //     }else{
-  //       arrayBounced.spliced(index, 1);
-  //     }
-  //   });
-  //   //player.bounced.iterations--;
-  //   //tryMove(player. player.bounced.axis, player.bounced.direction, player.bounced.intensidade);
-  // }
+  if(player.bounced.length > 0){
+    player.bounced.forEach( function(elemento, index, arrayBounced) {
+      if(elemento.iteracoes > 0 ){
+        elemento.iteracoes--;
+        tryMove(player, elemento.axis, elemento.direction, elemento.intensidade);
+        elemento.iteracoes <= 0 ? arrayBounced.splice(index, 1) : 1;
+        arrayBounced;
+      }
+      // }else{
+      //   arrayBounced.spliced(index, 1);
+      // }
+    });
+    //player.bounced.iterations--;
+    //tryMove(player. player.bounced.axis, player.bounced.direction, player.bounced.intensidade);
+  }
 
 }
 
@@ -231,9 +234,9 @@ function tryMove(player, f, u1, u2){
     if(!resultadoColisao){
       moveX(player, u1, u2);
     }else{
-      // if(resultadoColisao.bounce !== undefined) {
-      //   player.bounced.push(new Bounced({intensidade: resultadoColisao.bounce.intensidade, iteracoes: 5, axis: "x", direction: u1}));
-      // }  
+      if(resultadoColisao.bounce !== undefined) {
+        player.bounced.push(new Bounced({intensidade: resultadoColisao.bounce.intensidade, iteracoes: 5, axis: "x", direction: (-u1)}));
+      }  
       return 0;
     }
   }
