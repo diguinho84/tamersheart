@@ -122,6 +122,7 @@
       constructor(obj){
         this.intensidade = obj.intensidade;
         this.iteracoes = obj.iteracoes;
+        this.directions = obj.directions !== undefined ? obj.directions : [];
       }
     }
 
@@ -160,7 +161,7 @@ function init(){
   elementosMapa[1] = new Player({x: 70, y:alturaDefault -10, width:10, height:10})
   elementosMapa[2] = new Player({x: 90, y:alturaDefault -20, width:10, height:10})
   elementosMapa[3] = new Player({x: 120, y:alturaDefault -10, width:10, height:10})
-  elementosMapa[0].bounce = new Bounce({intensidade: 2.5, iteracoes: 4});
+  elementosMapa[0].bounce = new Bounce({intensidade: 2.5, iteracoes: 4, directions: ["left", "up"]});
   
   grounds[0] = new Quadrado(0, canvasHeight - alturaGroundCenario + 0.01, canvasWidth, canvasHeight/4) // se da altura igual e colisao
   grounds.push(...elementosMapa);
@@ -231,8 +232,10 @@ function tryMove(player, f, u1, u2){
   if(!resultadoColisao){
     moveXY(player, u1, u2, f);
   }else{
-    if(resultadoColisao.bounce !== undefined) {
-      player.bounced.push(new Bounced({intensidade: resultadoColisao.bounce.intensidade, iteracoes: resultadoColisao.bounce.iteracoes, axis: f, direction: (-u1)}));
+    if(resultadoColisao.bounce !== undefined ) {
+      if(bounceCorrespond(resultadoColisao.bounce.directions, u1, f)){
+        player.bounced.push(new Bounced({intensidade: resultadoColisao.bounce.intensidade, iteracoes: resultadoColisao.bounce.iteracoes, axis: f, direction: (-u1)}));
+      }
     }  
     return 0;
   }
@@ -240,6 +243,22 @@ function tryMove(player, f, u1, u2){
   return 1;
 }
 
+function bounceCorrespond(directions, u1, f){
+
+  var polaridade;
+  if( (u1 < 0) && ( f == "x") ){ polaridade = "right"}
+  if( (u1 > 0) && ( f == "x") ){ polaridade = "left"}
+  if( (u1 > 0) && ( f == "y") ){ polaridade = "up"}
+  if( (u1 < 0) && ( f == "y") ){ polaridade = "down"} 
+
+  for(var i = 0; i < directions.length; i++){
+
+    if(directions[i] == polaridade ){
+      return polaridade;
+    }
+  }
+
+}
 
 function moveXY(elemento, d, intensidade, f){
   f == "x" ? moveX(elemento, d, intensidade) : 1 ;
