@@ -151,7 +151,7 @@ function init(){
   //varaives padrao canvas
   initCanvasContextSettings();
 
-  alturaGroundCenario = 20;
+  alturaGroundCenario = 20; 
   alturaDefault = canvasHeight - alturaGroundCenario;
 
   //inicializa o player, talvez os demais elementos e players
@@ -161,7 +161,7 @@ function init(){
   elementosMapa[1] = new Player({x: 70, y:alturaDefault -10, width:10, height:10})
   elementosMapa[2] = new Player({x: 90, y:alturaDefault -20, width:10, height:10})
   elementosMapa[3] = new Player({x: 120, y:alturaDefault -10, width:10, height:10})
-  elementosMapa[0].bounce = new Bounce({intensidade: 2.5, iteracoes: 4, directions: ["left", "up"]});
+  elementosMapa[0].bounce = new Bounce({intensidade: 1.5, iteracoes: 40, directions: ["left", "up", "leftup"]});
   
   grounds[0] = new Quadrado(0, canvasHeight - alturaGroundCenario + 0.01, canvasWidth, canvasHeight/4) // se da altura igual e colisao
   grounds.push(...elementosMapa);
