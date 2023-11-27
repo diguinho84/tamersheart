@@ -23,8 +23,7 @@
     var player = 0;
     var alturaDefault = 0;
     var alturaGroundCenario = 0;
-    var pula = 0;
-
+    
     var distPadrao = 1;
     var gravidadePadrao = 1;
 
@@ -74,6 +73,9 @@
         this.width = obj.width;
         this.height = obj.height;
         this.bounced = [];
+        this.respostaAcoesPedidas = {
+            "pulo" : acaoPular
+        };
       }
       
       getXm(){ return this.x + (this.width/2) }
@@ -181,33 +183,24 @@ function setaVetoresDirecao(player, e){
 
   //Seta os vetores direcao
   //Como só tem keydown ou keyup deu pra fazer o ternario
-  if( e.key == "ArrowRight")         {  moveDireita  = e.type == "keydown" ?  1 : 0;}
-  if( e.key == "ArrowLeft")          {  moveEsquerda = e.type == "keydown" ?  1 : 0;}
+  if( e.key == "ArrowRight")         {  player.moveDireita  = e.type == "keydown" ?  1 : 0;}
+  if( e.key == "ArrowLeft")          {  player.moveEsquerda = e.type == "keydown" ?  1 : 0;}
   //if( e.key == "ArrowUp")            {  moveCima     = e.type == "keydown" ?  1 : 0;}
-  if( e.key == "ArrowDown")          {  moveBaixo    = e.type == "keydown" ?  1 : 0;}
+  if( e.key == "ArrowDown")          {  player.moveBaixo    = e.type == "keydown" ?  1 : 0;}
   //if( e.key == "a" || e.key == "A")  {  pula         = e.type == "keydown" ?  1 : 0;}
-  if( e.key == "ArrowUp")            {  pula         = e.type == "keydown" ?  1 : 0;}
+  if( e.key == "ArrowUp")            {  player.pula         = e.type == "keydown" ?  1 : 0;}
 }
 
 function movimentacaoLogica(player){
 
   //Aplica os vetores direcao
-  moveDireita  == 1 ? tryMove(player, "x", 1, distPadrao)  : true ;
-  moveEsquerda == 1 ? tryMove(player, "x", -1, distPadrao) : true ;
-  moveCima     == 1 ? tryMove(player, "y", -1, distPadrao) : true ;
-  moveBaixo    == 1 ? tryMove(player, "y", 1, distPadrao)  : true ;
+  player.moveDireita  == 1 ? tryMove(player, "x", 1, distPadrao)  : true ;
+  player.moveEsquerda == 1 ? tryMove(player, "x", -1, distPadrao) : true ;
+  player.moveCima     == 1 ? tryMove(player, "y", -1, distPadrao) : true ;
+  player.moveBaixo    == 1 ? tryMove(player, "y", 1, distPadrao)  : true ;
   
 
-  if( player.pulo !== undefined ) {//&& player.pulo.stacks < 2  ){
-    player.pulo.performa(player);
-    // player.pulo.stacks++;
-    // player.pulo.cima = 20;
-  }else{
-    if(isOnGround(player, grounds) && pula == 1 ){
-      player.pulo = new Pulo({size: 4, cima: 15, baixo: 0});
-      player.pulo.performa(player);
-    }
-  }
+  player.respostaAcoesPedidas["pulo"](player);
 
   if(player.bounced.length > 0){
     player.bounced.forEach( function(elemento, index, arrayBounced) {
@@ -399,6 +392,19 @@ function makeBounceable(obj, intensidade){
   }
 }
 
+function acaoPular(player){
+
+  if( player.pulo !== undefined ) {//&& player.pulo.stacks < 2  ){
+    player.pulo.performa(player);
+  }else{
+    if(isOnGround(player, grounds) && player.pula == 1 ){
+      player.pula = 0;
+      player.pulo = new Pulo({size: 4, cima: 15, baixo: 0});
+      player.pulo.performa(player);
+    }
+  }
+}
+
 //#endregion
 
 
@@ -481,12 +487,7 @@ function distancia(A, B){
     
     //facilitar o desenvolvimento, parece q se o codigo for bom deve ficar facil colocar melhorias
     //  e continuar
-    //parei aqui - acao simples em npc, bounce composto, movimento soco, soco composto, 
-    //  movimento de projetil 
-    //mvp - 4 raças (simplificar), 3 a 4 movimentos cada, baralho de cartas com 20 cartas, duelo de 3 min
-    //1 area pra explorar, 1 rancho (fazendinha), 1 coliseu
-    //acoes proprias da raça, ataques, logica de dano
-    //reescrever gravidade como classe a ser implementada como funcao base podende ser sobrescrita
+    //pareio aqui - fisica simuladada com acoes de pulo, e acoes proprias da raça, ataques, logica de dano
     //todos os valores abixo de height precisam ser revisados
     //colocar td no js
     //nao vai ter desempenho maximo nem rodar em td por hora
@@ -498,9 +499,6 @@ function distancia(A, B){
     //rn - precisa tirar nota em provas escrita e pratia pra ir ranked
     //talvez o raio medio entre o raio externo e o interno
     //bug com tres teclas
-    //rn - na expedicao talvez possa encontrar outros treinadores
-    //rn - cada captura precisa de acoes especificas desde nao item ate acoes conquistas ou itens
-    //rn (futuro) - alguns monstros serao por cidade ou bairro, estado ou regiao
 
 
     //ok - movimentacao simples, colocar pra Y e adequar classes, colisao simples
