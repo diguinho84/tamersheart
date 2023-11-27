@@ -394,7 +394,7 @@ function makeBounceable(obj, intensidade){
 
 function acaoPular(player){
 
-  if( player.pulo !== undefined ) {//&& player.pulo.stacks < 2  ){
+  if( player.pulo !== undefined ) {
     player.pulo.performa(player);
   }else{
     if(isOnGround(player, grounds) && player.pula == 1 ){
