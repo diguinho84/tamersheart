@@ -34,6 +34,8 @@
     var gravitaveis = [];
     var grounds = [];
 
+    var npc1;
+
 
 
     //classes
@@ -68,11 +70,14 @@
     class Player{
 
       constructor(obj){
+        this.idObj = obj.idObj !== undefined ? obj.idObj : 0; 
         this.x = obj.x;
         this.y = obj.y;
         this.width = obj.width;
         this.height = obj.height;
         this.bounced = [];
+        this.groundable = 1;
+        this.gravitavel = obj.gravitavel !== undefined ? obj.gravitavel : 0;
         this.respostaAcoesPedidas = {
             "pulo" : acaoPular
         };
@@ -157,17 +162,29 @@ function init(){
   alturaDefault = canvasHeight - alturaGroundCenario;
 
   //inicializa o player, talvez os demais elementos e players
-  player = new Player({x: 10, y:alturaDefault -15, width:10, height:10});
+  player = new Player({x: 10, y:alturaDefault -15, width:10, height:10, gravitavel: 1, idObj: "player"});
 
-  elementosMapa[0] = new Player({x: 50, y:alturaDefault -10, width:10, height:10})
-  elementosMapa[1] = new Player({x: 70, y:alturaDefault -10, width:10, height:10})
-  elementosMapa[2] = new Player({x: 90, y:alturaDefault -20, width:10, height:10})
-  elementosMapa[3] = new Player({x: 120, y:alturaDefault -10, width:10, height:10})
-  elementosMapa[0].bounce = new Bounce({intensidade: 1.5, iteracoes: 40, directions: ["left", "up", "leftup"]});
+  elementosMapa.push(player);
+  elementosMapa.push(new Player({x: 50, y:alturaDefault -10, width:10, height:10, idObj: "elemento0"}))
+  elementosMapa.push(new Player({x: 70, y:alturaDefault -10, width:10, height:10, idObj: "elemento1"}))
+  elementosMapa.push(new Player({x: 90, y:alturaDefault -20, width:10, height:10, idObj: "elemento2"}))
+  elementosMapa.push(new Player({x: 120, y:alturaDefault -10, width:10, height:10, gravitavel: 1, idObj: "elemento3"}))
+  elementosMapa.push(new Player({x: 0, y:canvasHeight - alturaGroundCenario + 0.01, width:canvasWidth, height:canvasHeight/4, idObj: "ground"}))
+
+  elementosMapa[1].bounce = new Bounce({intensidade: 1.5, iteracoes: 40, directions: ["left", "up", "leftup"]});
   
-  grounds[0] = new Quadrado(0, canvasHeight - alturaGroundCenario + 0.01, canvasWidth, canvasHeight/4) // se da altura igual e colisao
-  grounds.push(...elementosMapa);
-  gravitaveis[0] = player;
+  
+
+  //grounds[0] = new Quadrado(0, canvasHeight - alturaGroundCenario + 0.01, canvasWidth, canvasHeight/4) // se da altura igual e colisao
+  //grounds.push(...elementosMapa);
+  //grounds.splice(4,1)
+
+  npc1 = elementosMapa[4];
+
+  //gravitaveis[0] = player;
+  //gravitaveis[1] = npc1;
+
+  //gravitaveis[1] = elemento[3];
 
   //starta o loop de animacao
   window.requestAnimationFrame(draw);
@@ -220,7 +237,7 @@ function tryMove(player, f, u1, u2){
   var resultadoColisao;
     
   moveXY(projecaoPlayer, u1, u2, f);
-  resultadoColisao = colisaoComAlgumElementoMapa(projecaoPlayer, elementosMapa);
+  resultadoColisao = colisaoComAlgumElementoMapa(projecaoPlayer, elementosMapa.filter(obj => projecaoPlayer.idObj != obj.idObj ));
 
   if(!resultadoColisao){
     moveXY(player, u1, u2, f);
@@ -324,11 +341,11 @@ function colisaoComAlgumElementoMapa(projecaoPlayer, elementos){
     }
   }
 
-  for(var i = 0; i < grounds.length; i++){
-    if(colisaoComGroundable(projecaoPlayer, grounds[i])){
-      return grounds[i];
-    }
-  }
+  // for(var i = 0; i < grounds.length; i++){
+  //   if(colisaoComGroundable(projecaoPlayer, grounds[i])){
+  //     return grounds[i];
+  //   }
+  // }
 
   // var colide = colisaoComGroundable(projecaoPlayer, grounds);
   // if(colide){
@@ -364,9 +381,6 @@ function isOnGround(player, grounds){
     var projecaoPlayer = new Player(player);
     moveXY(projecaoPlayer, 1, distPadrao, "y");
 
-    // if(colisaoComGroundable(projecaoPlayer, grounds)){
-    //   return 1;
-    // }
     for(var i = 0; i < grounds.length; i++){
       if(colisaoComGroundable(projecaoPlayer, grounds[i])){
         return grounds[i];
@@ -381,6 +395,7 @@ function dist(pontoA, pontoB){
 
 function aplicaGravidade(gravidadePadrao){
 
+  var gravitaveis = elementosMapa.filter( obj => obj.gravitavel == 1 );
   gravitaveis.forEach( elemento => {tryMove(elemento, "y", 1, gravidadePadrao)} )
   //tryMove(player, "y", 1, 1);
 }
@@ -395,14 +410,21 @@ function makeBounceable(obj, intensidade){
 function acaoPular(player){
 
   if( player.pulo !== undefined ) {
+    player.pula = 0;
     player.pulo.performa(player);
   }else{
-    if(isOnGround(player, grounds) && player.pula == 1 ){
+    if(isOnGround(player, elementosMapa.filter(obj => obj.groundable == 1 && obj.idObj != player.idObj)) && player.pula == 1 ){
       player.pula = 0;
       player.pulo = new Pulo({size: 4, cima: 15, baixo: 0});
       player.pulo.performa(player);
     }
   }
+}
+
+function comandosLogicosNPC(jogavel){
+
+  //jogavel.pula = 1;
+  //jogavel.pulo = new Pulo({size: 4, cima: 2, baixo: 0});
 }
 
 //#endregion
@@ -446,7 +468,11 @@ function acaoPular(player){
 
   function draw() {
 
+    //comandosLogicosPlayer nao tem ainda por ser td teclado
+    comandosLogicosNPC(npc1);
+
     movimentacaoLogica(player);
+    movimentacaoLogica(npc1);
 
     aplicaGravidade(gravidadePadrao);
     aplicaGravidade(0.7*gravidadePadrao);
@@ -454,7 +480,7 @@ function acaoPular(player){
     
     limpaTela(); 
     desenha(player);
-    desenha(grounds[0]);
+    //desenha(grounds[0]);
     elementosMapa.forEach((elemento) => desenha(elemento));
 
     window.requestAnimationFrame(draw);
