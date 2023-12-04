@@ -250,7 +250,7 @@ function gerenciadorComandos(player){
 
   if(player.pilhaDeComandos.length > 0){
     var lastCommand = player.pilhaDeComandos[player.pilhaDeComandos.length - 1];
-    player.pilhaDeComandos = player.pilhaDeComandos.slice(player.pilhaDeComandos.length);
+    player.pilhaDeComandos = player.pilhaDeComandos.slice(0, -1);
     if(lastCommand.acao == "pular" ){
       player.respostaAcoesPedidas["pular"] = player.respostaAcoesPedidas["pular"] === undefined ? pular : player.respostaAcoesPedidas["pular"]; 
     }
