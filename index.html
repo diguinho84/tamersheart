@@ -78,9 +78,11 @@
         this.bounced = [];
         this.groundable = 1;
         this.gravitavel = obj.gravitavel !== undefined ? obj.gravitavel : 0;
-        this.respostaAcoesPedidas = {
-            "pulo" : acaoPular
-        };
+        this.respostaAcoesPedidas = [];
+        this.pilhaDeComandos = [];
+        // {
+        //     "pulo" : acaoPular
+        // };
       }
       
       getXm(){ return this.x + (this.width/2) }
@@ -92,6 +94,40 @@
     }
 
 
+    function pular(player){
+      
+      if(isOnGround(player, elementosMapa.filter(obj => obj.groundable == 1 && obj.idObj != player.idObj)) ){
+        player.pulo = new Pulo({size: 4, cima: 15, baixo: 0});
+      }
+
+      if(player.pulo !== undefined){
+        player.pulo.performa(player);
+      }
+
+      // if(factivelPular(player)){
+      //   player.pulo = new Pulo({size: 4, cima: 15, baixo: 0});
+      // }
+
+      // function factivelPular(player){
+      //   // if( player.respostaAcoesPedidas.pulo !== undefined ) {
+      //   //   return 0;
+      //   // }else{
+      //   //   if(isOnGround(player, elementosMapa.filter(obj => obj.groundable == 1 && obj.idObj != player.idObj)) && player.pula == 1 ){
+      //   //     player.pula = 0;
+      //   //     player.pulo = new Pulo({size: 4, cima: 15, baixo: 0});
+      //   //     player.pulo.performa(player);
+      //   //   }else{
+      //   //     return 0;
+      //   //   }
+      //   // }
+      //   if(isOnGround(player, elementosMapa.filter(obj => obj.groundable == 1 && obj.idObj != player.idObj)) ){
+      //     return 1;
+      //   }else{
+      //     return 0;
+      //   }
+      // }
+    }
+
     class Pulo{
       
       constructor(obj){
@@ -102,6 +138,7 @@
 
       performa(player){
 
+
         if(this.cima > 0){
           if( (tryMove(player, "y", -1, this.size))){
             this.cima--
@@ -109,15 +146,7 @@
             this.cima = 0;
           }
         }else{
-          // if(this.baixo > 0){
-          //   if( (tryMove(player, "y", 1, distPadrao))){
-          //     this.baixo--;
-          //   }else{
-          //     this.baixo = 0;
-          //   }
-          // }else{
-          //   delete player.pulo;
-          // }
+          player.nroPulos = player.nroPulos !== undefined ? player.nroPulos + 1 : 1;  
           delete player.pulo;
         }
       }
@@ -172,6 +201,7 @@ function init(){
   elementosMapa.push(new Player({x: 0, y:canvasHeight - alturaGroundCenario + 0.01, width:canvasWidth, height:canvasHeight/4, idObj: "ground"}))
 
   elementosMapa[1].bounce = new Bounce({intensidade: 1.5, iteracoes: 40, directions: ["left", "up", "leftup"]});
+  elementosMapa[4].bounce = new Bounce({intensidade: 1.5, iteracoes: 40, directions: ["left", "up", "leftup"]});
   
   
 
@@ -205,7 +235,10 @@ function setaVetoresDirecao(player, e){
   //if( e.key == "ArrowUp")            {  moveCima     = e.type == "keydown" ?  1 : 0;}
   if( e.key == "ArrowDown")          {  player.moveBaixo    = e.type == "keydown" ?  1 : 0;}
   //if( e.key == "a" || e.key == "A")  {  pula         = e.type == "keydown" ?  1 : 0;}
-  if( e.key == "ArrowUp")            {  player.pula         = e.type == "keydown" ?  1 : 0;}
+  //if( e.key == "ArrowUp")            {  player.pula         = e.type == "keydown" ?  1 : 0;}
+  //if( e.key == "ArrowUp")            {  player.pilhaDeComandos = e.type == "keydown" ?  [...player.pilhaDeComandos, "pular"] : [...player.pilhaDeComandos]}
+  //if( e.key == "ArrowUp")            {  if(player.pilhaDeComandos["pular"] === undefined){ player.pilhaDeComandos["pular"] = pular } }
+
 }
 
 function movimentacaoLogica(player){
@@ -217,8 +250,10 @@ function movimentacaoLogica(player){
   player.moveBaixo    == 1 ? tryMove(player, "y", 1, distPadrao)  : true ;
   
 
-  player.respostaAcoesPedidas["pulo"](player);
-
+  // if(player.pilhaDeComandos["pular"] !== undefined ){
+  //   player.respostaAcoesPedidas["acaoPular"](player);
+  // }
+  
   if(player.bounced.length > 0){
     player.bounced.forEach( function(elemento, index, arrayBounced) {
       if(elemento.iteracoes > 0 ){
@@ -423,8 +458,13 @@ function acaoPular(player){
 
 function comandosLogicosNPC(jogavel){
 
-  //jogavel.pula = 1;
-  //jogavel.pulo = new Pulo({size: 4, cima: 2, baixo: 0});
+  // if(jogavel.respostaAcoesPedidas["pular"] === undefined){
+  //   jogavel.respostaAcoesPedidas["pular"]
+  // }
+  jogavel.nroPulos >= 3 ? 1 : pular(jogavel);
+  //pular(jogavel); 
+  // jogavel.nroPulos = jogavel.nroPulos !== undefined ? jogavel.nroPulos + 1 : 0;
+  // jogavel.pula = jogavel.nroPulos >= 3 ? 0 : 1;
 }
 
 //#endregion
@@ -513,9 +553,11 @@ function distancia(A, B){
     
     //facilitar o desenvolvimento, parece q se o codigo for bom deve ficar facil colocar melhorias
     //  e continuar
-    //pareio aqui - fisica simuladada com acoes de pulo, e acoes proprias da raça, ataques, logica de dano
+    //parei aqui - gerenciador de acoes e empilhar comandos e talvez acoes pois ainda nao ha distincao 
+    //acao de knoback, soco e raduquen flash, idem em npc, logica de dano
     //todos os valores abixo de height precisam ser revisados
     //colocar td no js
+    //1 raça, 3 acoes, 1 expedicao com 1 mapa com 1 tela, 1 rancho fazenda, 1 comercio, 1 coliseu  
     //nao vai ter desempenho maximo nem rodar em td por hora
     //ok -ver classes pra ja colocar
     //colocar contexto de posicionamento e colisao
