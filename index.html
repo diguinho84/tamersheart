@@ -36,8 +36,6 @@
 
     var npc1;
 
-
-
     //classes
     class Quadrado {
 
@@ -94,6 +92,9 @@
     }
 
 
+    var sequencias = [["moveDireita", "moveDireita"]]
+    var previous = {};
+
     function pular(player){
       
       if(isOnGround(player, elementosMapa.filter(obj => obj.groundable == 1 && obj.idObj != player.idObj)) ){
@@ -148,6 +149,7 @@
         }else{
           player.nroPulos = player.nroPulos !== undefined ? player.nroPulos + 1 : 1;  
           delete player.pulo;
+          delete player.respostaAcoesPedidas["pular"];
         }
       }
 
@@ -238,7 +240,23 @@ function setaVetoresDirecao(player, e){
   //if( e.key == "ArrowUp")            {  player.pula         = e.type == "keydown" ?  1 : 0;}
   //if( e.key == "ArrowUp")            {  player.pilhaDeComandos = e.type == "keydown" ?  [...player.pilhaDeComandos, "pular"] : [...player.pilhaDeComandos]}
   //if( e.key == "ArrowUp")            {  if(player.pilhaDeComandos["pular"] === undefined){ player.pilhaDeComandos["pular"] = pular } }
+  //if( e.key == "ArrowUp")            {  if(player.pilhaDeComandos["pular"] === undefined){ player.pilhaDeComandos["pular"] = pular } }
+  //if( e.key == "ArrowUp")            {  if(player.respostaAcoesPedidas["pular"] === undefined){ player.respostaAcoesPedidas["pular"] = pular } }
+  if( e.key == "ArrowUp")              { player.pilhaDeComandos.push( {acao: "pular", frame: 0}) }
 
+}
+
+function gerenciadorComandos(player){
+
+  if(player.pilhaDeComandos.length > 0){
+    var lastCommand = player.pilhaDeComandos[player.pilhaDeComandos.length - 1];
+    player.pilhaDeComandos = player.pilhaDeComandos.slice(player.pilhaDeComandos.length);
+    if(lastCommand.acao == "pular" ){
+      player.respostaAcoesPedidas["pular"] = player.respostaAcoesPedidas["pular"] === undefined ? pular : player.respostaAcoesPedidas["pular"]; 
+    }
+    previous.acao = lastCommand.acao;
+    previous.frame = lastCommand.frame; 
+  }
 }
 
 function movimentacaoLogica(player){
@@ -249,10 +267,9 @@ function movimentacaoLogica(player){
   player.moveCima     == 1 ? tryMove(player, "y", -1, distPadrao) : true ;
   player.moveBaixo    == 1 ? tryMove(player, "y", 1, distPadrao)  : true ;
   
-
-  // if(player.pilhaDeComandos["pular"] !== undefined ){
-  //   player.respostaAcoesPedidas["acaoPular"](player);
-  // }
+  for(var acao in player.respostaAcoesPedidas){
+    player.respostaAcoesPedidas[acao](player);
+  }
   
   if(player.bounced.length > 0){
     player.bounced.forEach( function(elemento, index, arrayBounced) {
@@ -442,19 +459,19 @@ function makeBounceable(obj, intensidade){
   }
 }
 
-function acaoPular(player){
+// function acaoPular(player){
 
-  if( player.pulo !== undefined ) {
-    player.pula = 0;
-    player.pulo.performa(player);
-  }else{
-    if(isOnGround(player, elementosMapa.filter(obj => obj.groundable == 1 && obj.idObj != player.idObj)) && player.pula == 1 ){
-      player.pula = 0;
-      player.pulo = new Pulo({size: 4, cima: 15, baixo: 0});
-      player.pulo.performa(player);
-    }
-  }
-}
+//   if( player.pulo !== undefined ) {
+//     player.pula = 0;
+//     player.pulo.performa(player);
+//   }else{
+//     if(isOnGround(player, elementosMapa.filter(obj => obj.groundable == 1 && obj.idObj != player.idObj)) && player.pula == 1 ){
+//       player.pula = 0;
+//       player.pulo = new Pulo({size: 4, cima: 15, baixo: 0});
+//       player.pulo.performa(player);
+//     }
+//   }
+// }
 
 function comandosLogicosNPC(jogavel){
 
@@ -510,6 +527,8 @@ function comandosLogicosNPC(jogavel){
 
     //comandosLogicosPlayer nao tem ainda por ser td teclado
     comandosLogicosNPC(npc1);
+
+    gerenciadorComandos(player)
 
     movimentacaoLogica(player);
     movimentacaoLogica(npc1);

@@ -10,9 +10,35 @@
     var variavel = {
         "naosei" : 1
     }
-    console.log(variavel["naosei"]);
+
+    var frutas = [];
+    frutas["uva"] = 1;
+    frutas["laranja"] = 2;
+    frutas["pera"] = 3;
+
+    // var frutas2 = [];
+    // frutas2["uva"] = 2;
+    // frutas2["pera"] = 3;
+
+    function deletaObjeto(obj){
+        delete obj.uva; 
+    }
+
+    function hasSubArray(master, sub) {
+        return sub.every((i => v => i = master.indexOf(v, i) + 1)(0));
+    }
+
+    document.addEventListener("DOMContentLoaded", function(event) {
+      //document.getElementById("naosei").innerHTML = (1 == 1);
+      //delete variavel.naosei2;
+      //document.getElementById("naosei").innerHTML = hasSubArray(frutas, frutas2)
+      deletaObjeto(frutas);
+      document.getElementById("naosei").innerHTML = frutas.uva;
+    });
+
 </script>
 <body>
     <p>hello world</p>
+    <div id="naosei">nao sei</div>
 </body>
 </html>
