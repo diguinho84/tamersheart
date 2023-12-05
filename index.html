@@ -25,6 +25,7 @@
     var alturaGroundCenario = 0;
     
     var distPadrao = 1;
+    var avancoPadrao = 10;
     var gravidadePadrao = 1;
 
     var teclaPressionada;
@@ -77,7 +78,7 @@
         this.groundable = 1;
         this.gravitavel = obj.gravitavel !== undefined ? obj.gravitavel : 0;
         this.respostaAcoesPedidas = [];
-        this.pilhaDeComandos = [];
+        this.pilhaDeComandos = {"senquencia" : []};
         // {
         //     "pulo" : acaoPular
         // };
@@ -232,10 +233,19 @@ function setaVetoresDirecao(player, e){
 
   //Seta os vetores direcao
   //Como só tem keydown ou keyup deu pra fazer o ternario
-  if( e.key == "ArrowRight")         {  player.moveDireita  = e.type == "keydown" ?  1 : 0;}
-  if( e.key == "ArrowLeft")          {  player.moveEsquerda = e.type == "keydown" ?  1 : 0;}
+  if( e.key == "ArrowRight")         {  
+    if((e.type == "keydown") && (player.pilhaDeComandos["esq"] === undefined ) ){
+      player.pilhaDeComandos["esq"] = 1;
+      player.pilhaDeComandos["sequencia"].push("esq");
+    }
+    if((e.type == "keyup") && (player.pilhaDeComandos["esq"] !== undefined ) ){
+      player.pilhaDeComandos["esq"] = 1;
+      player.pilhaDeComandos["sequencia"].push("esq");
+    }
+  }
+  if( e.key == "ArrowLeft")          {  e.type == "keydown" ?  player.pilhaDeComandos.push({acao: "tryMoveEsq", frame: 0}) : player.pilhaDeComandos.push({acao: "tryStopMoveEsq", frame: 0});}
   //if( e.key == "ArrowUp")            {  moveCima     = e.type == "keydown" ?  1 : 0;}
-  if( e.key == "ArrowDown")          {  player.moveBaixo    = e.type == "keydown" ?  1 : 0;}
+  if( e.key == "ArrowDown")          {  e.type == "keydown" ?  player.pilhaDeComandos.push({acao: "tryMoveBaixo", frame: 0}) : player.pilhaDeComandos.push({acao: "tryStopMoveBaixo", frame: 0});}
   //if( e.key == "a" || e.key == "A")  {  pula         = e.type == "keydown" ?  1 : 0;}
   //if( e.key == "ArrowUp")            {  player.pula         = e.type == "keydown" ?  1 : 0;}
   //if( e.key == "ArrowUp")            {  player.pilhaDeComandos = e.type == "keydown" ?  [...player.pilhaDeComandos, "pular"] : [...player.pilhaDeComandos]}
@@ -248,12 +258,43 @@ function setaVetoresDirecao(player, e){
 
 function gerenciadorComandos(player){
 
+  console.log(player.pilhaDeComandos)
   if(player.pilhaDeComandos.length > 0){
     var lastCommand = player.pilhaDeComandos[player.pilhaDeComandos.length - 1];
-    player.pilhaDeComandos = player.pilhaDeComandos.slice(0, -1);
-    if(lastCommand.acao == "pular" ){
-      player.respostaAcoesPedidas["pular"] = player.respostaAcoesPedidas["pular"] === undefined ? pular : player.respostaAcoesPedidas["pular"]; 
+    //player.pilhaDeComandos = player.pilhaDeComandos.slice(0, -1);
+
+    if(lastCommand.acao == "tryMoveEsq" ){
+      player.respostaAcoesPedidas["tryMoveEsq"] = player.respostaAcoesPedidas["tryMoveEsq"] === undefined ? tryMoveEsq : player.respostaAcoesPedidas["tryMoveEsq"]; 
     }
+
+    if(lastCommand.acao == "tryStopMoveEsq" ){
+      player.respostaAcoesPedidas["tryMoveEsq"] === undefined ? 0 : delete player.respostaAcoesPedidas["tryMoveEsq"]; 
+    }
+    
+    if(lastCommand.acao == "tryMoveDir" ){
+      player.respostaAcoesPedidas["tryMoveDir"] = player.respostaAcoesPedidas["tryMoveDir"] === undefined ? tryMoveDir : player.respostaAcoesPedidas["tryMoveDir"]; 
+    }
+
+    if(lastCommand.acao == "tryMoveDir" && previous.acao == "tryMoveDir" ){
+      player.respostaAcoesPedidas["tryMoveDir"] = player.respostaAcoesPedidas["tryMoveDir"] === undefined ? tryAvancoDir : tryAvancoDir; 
+    }
+
+    if(lastCommand.acao == "tryStopMoveDir" ){
+      player.respostaAcoesPedidas["tryMoveDir"] === undefined ? 0 : delete player.respostaAcoesPedidas["tryMoveDir"]; 
+    }
+
+    if(lastCommand.acao == "tryMoveBaixo" ){
+      player.respostaAcoesPedidas["tryMoveBaixo"] = player.respostaAcoesPedidas["tryMoveBaixo"] === undefined ? tryMoveBaixo : player.respostaAcoesPedidas["tryMoveBaixo"]; 
+    }
+
+    if(lastCommand.acao == "tryStopMoveBaixo" ){
+      player.respostaAcoesPedidas["tryMoveBaixo"] === undefined ? 0 : delete player.respostaAcoesPedidas["tryMoveBaixo"]; 
+    }
+    
+    if(lastCommand.acao == "pular" ){
+      player.respostaAcoesPedidas["pular"] = player.respostaAcoesPedidas["pular"] === undefined ? pular : player.respostaAcoesPedidas["pular"];
+    }
+
     previous.acao = lastCommand.acao;
     previous.frame = lastCommand.frame; 
   }
@@ -262,10 +303,10 @@ function gerenciadorComandos(player){
 function movimentacaoLogica(player){
 
   //Aplica os vetores direcao
-  player.moveDireita  == 1 ? tryMove(player, "x", 1, distPadrao)  : true ;
-  player.moveEsquerda == 1 ? tryMove(player, "x", -1, distPadrao) : true ;
-  player.moveCima     == 1 ? tryMove(player, "y", -1, distPadrao) : true ;
-  player.moveBaixo    == 1 ? tryMove(player, "y", 1, distPadrao)  : true ;
+  // player.moveDireita  == 1 ? tryMove(player, "x", 1, distPadrao)  : true ;
+  // player.moveEsquerda == 1 ? tryMove(player, "x", -1, distPadrao) : true ;
+  // player.moveCima     == 1 ? tryMove(player, "y", -1, distPadrao) : true ;
+  // player.moveBaixo    == 1 ? tryMove(player, "y", 1, distPadrao)  : true ;
   
   for(var acao in player.respostaAcoesPedidas){
     player.respostaAcoesPedidas[acao](player);
@@ -280,7 +321,35 @@ function movimentacaoLogica(player){
       }
     });
   }
+}
 
+function tryMoveEsq(player){
+  var valor = tryMove(player, "x", -1, distPadrao);
+  //delete player.respostaAcoesPedidas["tryMoveEsq"]
+  return valor;
+}
+
+function tryMoveDir(player){
+  var valor = tryMove(player, "x", 1, distPadrao);
+  //delete player.respostaAcoesPedidas["tryMoveDir"]
+  return valor;
+}
+
+function tryAvancoDir(player){
+  var valor = tryMove(player, "x", 1, avancoPadrao);
+  return valor;
+}
+
+function tryMoveCima(player){
+  var valor = tryMove(player, "y", -1, distPadrao);
+  //delete player.respostaAcoesPedidas["tryMoveCima"]
+  return valor;
+}
+
+function tryMoveBaixo(player){
+  var valor = tryMove(player, "y", 1, distPadrao);
+  //delete player.respostaAcoesPedidas["tryMoveBaixo"]
+  return valor;
 }
 
 function tryMove(player, f, u1, u2){

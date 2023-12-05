@@ -39,6 +39,8 @@
       frutas.splice(2, 1);
       somas.splice(2, 1);
       somas = somas.slice(0, -1);
+      somas[0] = undefined;
+      document.getElementById("naosei").innerHTML = (frutas["naosei"] === undefined);
       console.log(frutas);
       console.log(somas);
     });
