@@ -245,17 +245,47 @@ function setaVetoresDirecao(player, e){
       player.pilhaDeComandos["direcoes"]["dir"] = 0;
     }
   }
+
+  if( e.key == "ArrowLeft")         {  
+    if((e.type == "keydown") && (player.pilhaDeComandos["direcoes"]["esq"] !== 1 ) ){
+      player.pilhaDeComandos["direcoes"]["esq"] = 1;
+      player.pilhaDeComandos["sequencia"].push("esq");
+    }
+    if((e.type == "keyup") && (player.pilhaDeComandos["direcoes"]["esq"] !== 0 ) ){
+      player.pilhaDeComandos["direcoes"]["esq"] = 0;
+    }
+  }
+
+  if( e.key == "ArrowUp")         {  
+    if((e.type == "keydown") && (player.pilhaDeComandos["direcoes"]["cima"] !== 1 ) ){
+      player.pilhaDeComandos["direcoes"]["cima"] = 1;
+      player.pilhaDeComandos["sequencia"].push("cima");
+    }
+    if((e.type == "keyup") && (player.pilhaDeComandos["direcoes"]["cima"] !== 0 ) ){
+      player.pilhaDeComandos["direcoes"]["cima"] = 0;
+    }
+  }
+
+  if( e.key == "ArrowDown")         {  
+    if((e.type == "keydown") && (player.pilhaDeComandos["direcoes"]["baixo"] !== 1 ) ){
+      player.pilhaDeComandos["direcoes"]["baixo"] = 1;
+      player.pilhaDeComandos["sequencia"].push("baixo");
+    }
+    if((e.type == "keyup") && (player.pilhaDeComandos["direcoes"]["baixo"] !== 0 ) ){
+      player.pilhaDeComandos["direcoes"]["baixo"] = 0;
+    }
+  }
   
-  if( e.key == "ArrowLeft")          {  e.type == "keydown" ?  player.pilhaDeComandos.push({acao: "tryMoveEsq", frame: 0}) : player.pilhaDeComandos.push({acao: "tryStopMoveEsq", frame: 0});}
+  //if( e.key == "ArrowLeft")          {  e.type == "keydown" ?  player.pilhaDeComandos.push({acao: "tryMoveEsq", frame: 0}) : player.pilhaDeComandos.push({acao: "tryStopMoveEsq", frame: 0});}
   //if( e.key == "ArrowUp")            {  moveCima     = e.type == "keydown" ?  1 : 0;}
-  if( e.key == "ArrowDown")          {  e.type == "keydown" ?  player.pilhaDeComandos.push({acao: "tryMoveBaixo", frame: 0}) : player.pilhaDeComandos.push({acao: "tryStopMoveBaixo", frame: 0});}
+  //if( e.key == "ArrowDown")          {  e.type == "keydown" ?  player.pilhaDeComandos.push({acao: "tryMoveBaixo", frame: 0}) : player.pilhaDeComandos.push({acao: "tryStopMoveBaixo", frame: 0});}
   //if( e.key == "a" || e.key == "A")  {  pula         = e.type == "keydown" ?  1 : 0;}
   //if( e.key == "ArrowUp")            {  player.pula         = e.type == "keydown" ?  1 : 0;}
   //if( e.key == "ArrowUp")            {  player.pilhaDeComandos = e.type == "keydown" ?  [...player.pilhaDeComandos, "pular"] : [...player.pilhaDeComandos]}
   //if( e.key == "ArrowUp")            {  if(player.pilhaDeComandos["pular"] === undefined){ player.pilhaDeComandos["pular"] = pular } }
   //if( e.key == "ArrowUp")            {  if(player.pilhaDeComandos["pular"] === undefined){ player.pilhaDeComandos["pular"] = pular } }
   //if( e.key == "ArrowUp")            {  if(player.respostaAcoesPedidas["pular"] === undefined){ player.respostaAcoesPedidas["pular"] = pular } }
-  if( e.key == "ArrowUp")              { player.pilhaDeComandos.push( {acao: "pular", frame: 0}) }
+  //if( e.key == "ArrowUp")              { player.pilhaDeComandos.push( {acao: "pular", frame: 0}) }
 
 }
 
@@ -269,6 +299,27 @@ function gerenciadorComandos(player){
     }
     if(key == "dir" && (player.pilhaDeComandos["direcoes"]["dir"] == 0 ) ){
       player.respostaAcoesPedidas["tryMoveDir"] !== undefined ? delete player.respostaAcoesPedidas["tryMoveDir"] : 0;      
+    }
+
+    if(key == "esq" && (player.pilhaDeComandos["direcoes"]["esq"] == 1 ) ){
+      player.respostaAcoesPedidas["tryMoveEsq"] = player.respostaAcoesPedidas["tryMoveEsq"] === undefined ? tryMoveEsq : player.respostaAcoesPedidas["tryMoveEsq"];      
+    }
+    if(key == "esq" && (player.pilhaDeComandos["direcoes"]["esq"] == 0 ) ){
+      player.respostaAcoesPedidas["tryMoveEsq"] !== undefined ? delete player.respostaAcoesPedidas["tryMoveEsq"] : 0;      
+    }
+
+    if(key == "baixo" && (player.pilhaDeComandos["direcoes"]["baixo"] == 1 ) ){
+      player.respostaAcoesPedidas["tryMoveBaixo"] = player.respostaAcoesPedidas["tryMoveBaixo"] === undefined ? tryMoveBaixo : player.respostaAcoesPedidas["tryMoveBaixo"];      
+    }
+    if(key == "baixo" && (player.pilhaDeComandos["direcoes"]["baixo"] == 0 ) ){
+      player.respostaAcoesPedidas["tryMoveBaixo"] !== undefined ? delete player.respostaAcoesPedidas["tryMoveBaixo"] : 0;      
+    }
+
+    if(key == "cima" && (player.pilhaDeComandos["direcoes"]["cima"] == 1 ) ){
+      player.respostaAcoesPedidas["pular"] = player.respostaAcoesPedidas["pular"] === undefined ? pular : player.respostaAcoesPedidas["pular"];      
+    }
+    if(key == "cima" && (player.pilhaDeComandos["direcoes"]["cima"] == 0 ) ){
+      //player.respostaAcoesPedidas["pular"] !== undefined ? delete player.respostaAcoesPedidas["pular"] : 0;      
     }
 
   }
@@ -325,15 +376,15 @@ function movimentacaoLogica(player){
     player.respostaAcoesPedidas[acao](player);
   }
   
-  if(player.bounced.length > 0){
-    player.bounced.forEach( function(elemento, index, arrayBounced) {
-      if(elemento.iteracoes > 0 ){
-        elemento.iteracoes--;
-        tryMove(player, elemento.axis, elemento.direction, elemento.intensidade);
-        elemento.iteracoes <= 0 ? arrayBounced.splice(index, 1) : 1;
-      }
-    });
-  }
+  // if(player.bounced.length > 0){
+  //   player.bounced.forEach( function(elemento, index, arrayBounced) {
+  //     if(elemento.iteracoes > 0 ){
+  //       elemento.iteracoes--;
+  //       tryMove(player, elemento.axis, elemento.direction, elemento.intensidade);
+  //       elemento.iteracoes <= 0 ? arrayBounced.splice(index, 1) : 1;
+  //     }
+  //   });
+  // }
 }
 
 function tryMoveEsq(player){
