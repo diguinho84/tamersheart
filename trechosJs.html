@@ -13,8 +13,8 @@
 
     var frutas = [];
     frutas["uva"] = 1;
-    frutas["laranja"] = 2;
-    frutas["pera"] = 3;
+    // frutas["laranja"] = 2;
+    // frutas["pera"] = 3;
 
     var somas = [1, 2, 3, 4, 5]
 
@@ -36,13 +36,14 @@
       //document.getElementById("naosei").innerHTML = hasSubArray(frutas, frutas2)
       //deletaObjeto(frutas);
       //document.getElementById("naosei").innerHTML = frutas.uva;
-      frutas.splice(2, 1);
-      somas.splice(2, 1);
-      somas = somas.slice(0, -1);
-      somas[0] = undefined;
-      document.getElementById("naosei").innerHTML = (frutas["naosei"] === undefined);
-      console.log(frutas);
-      console.log(somas);
+    //   frutas.splice(2, 1);
+    //   somas.splice(2, 1);
+    //   somas = somas.slice(0, -1);
+    //   somas[0] = undefined;
+    //   document.getElementById("naosei").innerHTML = (frutas["naosei"] === undefined);
+    delete frutas["uva"]  
+    console.log(frutas);
+      //console.log(somas);
     });
 
 </script>

@@ -78,7 +78,10 @@
         this.groundable = 1;
         this.gravitavel = obj.gravitavel !== undefined ? obj.gravitavel : 0;
         this.respostaAcoesPedidas = [];
-        this.pilhaDeComandos = {"senquencia" : []};
+        this.pilhaDeComandos = {
+          "direcoes"  : [],    
+          "sequencia" : []
+        };
         // {
         //     "pulo" : acaoPular
         // };
@@ -234,15 +237,15 @@ function setaVetoresDirecao(player, e){
   //Seta os vetores direcao
   //Como só tem keydown ou keyup deu pra fazer o ternario
   if( e.key == "ArrowRight")         {  
-    if((e.type == "keydown") && (player.pilhaDeComandos["esq"] === undefined ) ){
-      player.pilhaDeComandos["esq"] = 1;
-      player.pilhaDeComandos["sequencia"].push("esq");
+    if((e.type == "keydown") && (player.pilhaDeComandos["direcoes"]["dir"] !== 1 ) ){
+      player.pilhaDeComandos["direcoes"]["dir"] = 1;
+      player.pilhaDeComandos["sequencia"].push("dir");
     }
-    if((e.type == "keyup") && (player.pilhaDeComandos["esq"] !== undefined ) ){
-      player.pilhaDeComandos["esq"] = 1;
-      player.pilhaDeComandos["sequencia"].push("esq");
+    if((e.type == "keyup") && (player.pilhaDeComandos["direcoes"]["dir"] !== 0 ) ){
+      player.pilhaDeComandos["direcoes"]["dir"] = 0;
     }
   }
+  
   if( e.key == "ArrowLeft")          {  e.type == "keydown" ?  player.pilhaDeComandos.push({acao: "tryMoveEsq", frame: 0}) : player.pilhaDeComandos.push({acao: "tryStopMoveEsq", frame: 0});}
   //if( e.key == "ArrowUp")            {  moveCima     = e.type == "keydown" ?  1 : 0;}
   if( e.key == "ArrowDown")          {  e.type == "keydown" ?  player.pilhaDeComandos.push({acao: "tryMoveBaixo", frame: 0}) : player.pilhaDeComandos.push({acao: "tryStopMoveBaixo", frame: 0});}
@@ -259,45 +262,55 @@ function setaVetoresDirecao(player, e){
 function gerenciadorComandos(player){
 
   console.log(player.pilhaDeComandos)
-  if(player.pilhaDeComandos.length > 0){
-    var lastCommand = player.pilhaDeComandos[player.pilhaDeComandos.length - 1];
+  for(var key in player.pilhaDeComandos["direcoes"]){
+    
+    if(key == "dir" && (player.pilhaDeComandos["direcoes"]["dir"] == 1 ) ){
+      player.respostaAcoesPedidas["tryMoveDir"] = player.respostaAcoesPedidas["tryMoveDir"] === undefined ? tryMoveDir : player.respostaAcoesPedidas["tryMoveDir"];      
+    }
+    if(key == "dir" && (player.pilhaDeComandos["direcoes"]["dir"] == 0 ) ){
+      player.respostaAcoesPedidas["tryMoveDir"] !== undefined ? delete player.respostaAcoesPedidas["tryMoveDir"] : 0;      
+    }
+
+  }
+  //if(player.pilhaDeComandos.length > 0){
+    //var lastCommand = player.pilhaDeComandos[player.pilhaDeComandos.length - 1];
     //player.pilhaDeComandos = player.pilhaDeComandos.slice(0, -1);
 
-    if(lastCommand.acao == "tryMoveEsq" ){
-      player.respostaAcoesPedidas["tryMoveEsq"] = player.respostaAcoesPedidas["tryMoveEsq"] === undefined ? tryMoveEsq : player.respostaAcoesPedidas["tryMoveEsq"]; 
-    }
+    // if(player.pilhaDeComandos["dir"]){
+    //   player.respostaAcoesPedidas["tryMoveDir"] = player.respostaAcoesPedidas["tryMoveDir"] === undefined ? tryMoveDir : player.respostaAcoesPedidas["tryMoveDir"]; 
+    // }
 
-    if(lastCommand.acao == "tryStopMoveEsq" ){
-      player.respostaAcoesPedidas["tryMoveEsq"] === undefined ? 0 : delete player.respostaAcoesPedidas["tryMoveEsq"]; 
-    }
+    // if(lastCommand.acao == "tryStopMoveEsq" ){
+    //   player.respostaAcoesPedidas["tryMoveEsq"] === undefined ? 0 : delete player.respostaAcoesPedidas["tryMoveEsq"]; 
+    // }
     
-    if(lastCommand.acao == "tryMoveDir" ){
-      player.respostaAcoesPedidas["tryMoveDir"] = player.respostaAcoesPedidas["tryMoveDir"] === undefined ? tryMoveDir : player.respostaAcoesPedidas["tryMoveDir"]; 
-    }
+    // if(lastCommand.acao == "tryMoveDir" ){
+    //   player.respostaAcoesPedidas["tryMoveDir"] = player.respostaAcoesPedidas["tryMoveDir"] === undefined ? tryMoveDir : player.respostaAcoesPedidas["tryMoveDir"]; 
+    // }
 
-    if(lastCommand.acao == "tryMoveDir" && previous.acao == "tryMoveDir" ){
-      player.respostaAcoesPedidas["tryMoveDir"] = player.respostaAcoesPedidas["tryMoveDir"] === undefined ? tryAvancoDir : tryAvancoDir; 
-    }
+    // if(lastCommand.acao == "tryMoveDir" && previous.acao == "tryMoveDir" ){
+    //   player.respostaAcoesPedidas["tryMoveDir"] = player.respostaAcoesPedidas["tryMoveDir"] === undefined ? tryAvancoDir : tryAvancoDir; 
+    // }
 
-    if(lastCommand.acao == "tryStopMoveDir" ){
-      player.respostaAcoesPedidas["tryMoveDir"] === undefined ? 0 : delete player.respostaAcoesPedidas["tryMoveDir"]; 
-    }
+    // if(lastCommand.acao == "tryStopMoveDir" ){
+    //   player.respostaAcoesPedidas["tryMoveDir"] === undefined ? 0 : delete player.respostaAcoesPedidas["tryMoveDir"]; 
+    // }
 
-    if(lastCommand.acao == "tryMoveBaixo" ){
-      player.respostaAcoesPedidas["tryMoveBaixo"] = player.respostaAcoesPedidas["tryMoveBaixo"] === undefined ? tryMoveBaixo : player.respostaAcoesPedidas["tryMoveBaixo"]; 
-    }
+    // if(lastCommand.acao == "tryMoveBaixo" ){
+    //   player.respostaAcoesPedidas["tryMoveBaixo"] = player.respostaAcoesPedidas["tryMoveBaixo"] === undefined ? tryMoveBaixo : player.respostaAcoesPedidas["tryMoveBaixo"]; 
+    // }
 
-    if(lastCommand.acao == "tryStopMoveBaixo" ){
-      player.respostaAcoesPedidas["tryMoveBaixo"] === undefined ? 0 : delete player.respostaAcoesPedidas["tryMoveBaixo"]; 
-    }
+    // if(lastCommand.acao == "tryStopMoveBaixo" ){
+    //   player.respostaAcoesPedidas["tryMoveBaixo"] === undefined ? 0 : delete player.respostaAcoesPedidas["tryMoveBaixo"]; 
+    // }
     
-    if(lastCommand.acao == "pular" ){
-      player.respostaAcoesPedidas["pular"] = player.respostaAcoesPedidas["pular"] === undefined ? pular : player.respostaAcoesPedidas["pular"];
-    }
+    // if(lastCommand.acao == "pular" ){
+    //   player.respostaAcoesPedidas["pular"] = player.respostaAcoesPedidas["pular"] === undefined ? pular : player.respostaAcoesPedidas["pular"];
+    // }
 
-    previous.acao = lastCommand.acao;
-    previous.frame = lastCommand.frame; 
-  }
+    //previous.acao = lastCommand.acao;
+    //previous.frame = lastCommand.frame; 
+  //}
 }
 
 function movimentacaoLogica(player){
@@ -643,6 +656,7 @@ function distancia(A, B){
     //  e continuar
     //parei aqui - gerenciador de acoes e empilhar comandos e talvez acoes pois ainda nao ha distincao 
     //acao de knoback, soco e raduquen flash, idem em npc, logica de dano
+    //flush no vetor de sequencia de comandos
     //todos os valores abixo de height precisam ser revisados
     //colocar td no js
     //1 raça, 3 acoes, 1 expedicao com 1 mapa com 1 tela, 1 rancho fazenda, 1 comercio, 1 coliseu  
