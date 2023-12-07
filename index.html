@@ -266,7 +266,11 @@ function gerenciadorComandos(player){
     }
 
     if(key == "esq" && (player.pilhaDeComandos["direcoes"]["esq"] == 1 ) ){
-      player.respostaAcoesPedidas["tryMoveEsq"] = player.respostaAcoesPedidas["tryMoveEsq"] === undefined ? tryMoveEsq : player.respostaAcoesPedidas["tryMoveEsq"];      
+      if( ultimo == "esq" && (penultimo == "esq") ){
+        player.respostaAcoesPedidas["tryMoveEsq"] = player.respostaAcoesPedidas["tryMoveEsq"] === undefined ? tryAvancoEsq : player.respostaAcoesPedidas["tryMoveEsq"];  
+      }else{
+        player.respostaAcoesPedidas["tryMoveEsq"] = player.respostaAcoesPedidas["tryMoveEsq"] === undefined ? tryMoveEsq : player.respostaAcoesPedidas["tryMoveEsq"];
+      }
     }
     if(key == "esq" && (player.pilhaDeComandos["direcoes"]["esq"] == 0 ) ){
       player.respostaAcoesPedidas["tryMoveEsq"] !== undefined ? delete player.respostaAcoesPedidas["tryMoveEsq"] : 0;      
@@ -354,6 +358,11 @@ function movimentacaoLogica(player){
 function tryMoveEsq(player){
   var valor = tryMove(player, "x", -1, distPadrao);
   //delete player.respostaAcoesPedidas["tryMoveEsq"]
+  return valor;
+}
+
+function tryAvancoEsq(player){
+  var valor = tryMove(player, "x", -1, avancoPadrao);
   return valor;
 }
 
@@ -660,10 +669,8 @@ function distancia(A, B){
     
     //facilitar o desenvolvimento, parece q se o codigo for bom deve ficar facil colocar melhorias
     //  e continuar
-    //parei aqui - gerenciador de acoes e empilhar comandos e talvez acoes pois ainda nao ha distincao 
-    //replica do movimento de dash para a esquerda
-    //leitura da pilha com frame time
     //acao de knoback, soco e raduquen flash, idem em npc, logica de dano
+    //leitura da pilha com frame time
     //flush no vetor de sequencia de comandos
     //todos os valores abixo de height precisam ser revisados
     //colocar td no js
