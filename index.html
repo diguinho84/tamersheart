@@ -25,7 +25,7 @@
     var alturaGroundCenario = 0;
     
     var distPadrao = 1;
-    var avancoPadrao = 10;
+    var avancoPadrao = 3;
     var gravidadePadrao = 1;
 
     var teclaPressionada;
@@ -95,8 +95,6 @@
       
     }
 
-
-    var sequencias = [["moveDireita", "moveDireita"]]
     var previous = {};
 
     function pular(player){
@@ -108,29 +106,6 @@
       if(player.pulo !== undefined){
         player.pulo.performa(player);
       }
-
-      // if(factivelPular(player)){
-      //   player.pulo = new Pulo({size: 4, cima: 15, baixo: 0});
-      // }
-
-      // function factivelPular(player){
-      //   // if( player.respostaAcoesPedidas.pulo !== undefined ) {
-      //   //   return 0;
-      //   // }else{
-      //   //   if(isOnGround(player, elementosMapa.filter(obj => obj.groundable == 1 && obj.idObj != player.idObj)) && player.pula == 1 ){
-      //   //     player.pula = 0;
-      //   //     player.pulo = new Pulo({size: 4, cima: 15, baixo: 0});
-      //   //     player.pulo.performa(player);
-      //   //   }else{
-      //   //     return 0;
-      //   //   }
-      //   // }
-      //   if(isOnGround(player, elementosMapa.filter(obj => obj.groundable == 1 && obj.idObj != player.idObj)) ){
-      //     return 1;
-      //   }else{
-      //     return 0;
-      //   }
-      // }
     }
 
     class Pulo{
@@ -209,18 +184,7 @@ function init(){
   elementosMapa[1].bounce = new Bounce({intensidade: 1.5, iteracoes: 40, directions: ["left", "up", "leftup"]});
   elementosMapa[4].bounce = new Bounce({intensidade: 1.5, iteracoes: 40, directions: ["left", "up", "leftup"]});
   
-  
-
-  //grounds[0] = new Quadrado(0, canvasHeight - alturaGroundCenario + 0.01, canvasWidth, canvasHeight/4) // se da altura igual e colisao
-  //grounds.push(...elementosMapa);
-  //grounds.splice(4,1)
-
   npc1 = elementosMapa[4];
-
-  //gravitaveis[0] = player;
-  //gravitaveis[1] = npc1;
-
-  //gravitaveis[1] = elemento[3];
 
   //starta o loop de animacao
   window.requestAnimationFrame(draw);
@@ -275,27 +239,27 @@ function setaVetoresDirecao(player, e){
       player.pilhaDeComandos["direcoes"]["baixo"] = 0;
     }
   }
-  
-  //if( e.key == "ArrowLeft")          {  e.type == "keydown" ?  player.pilhaDeComandos.push({acao: "tryMoveEsq", frame: 0}) : player.pilhaDeComandos.push({acao: "tryStopMoveEsq", frame: 0});}
-  //if( e.key == "ArrowUp")            {  moveCima     = e.type == "keydown" ?  1 : 0;}
-  //if( e.key == "ArrowDown")          {  e.type == "keydown" ?  player.pilhaDeComandos.push({acao: "tryMoveBaixo", frame: 0}) : player.pilhaDeComandos.push({acao: "tryStopMoveBaixo", frame: 0});}
-  //if( e.key == "a" || e.key == "A")  {  pula         = e.type == "keydown" ?  1 : 0;}
-  //if( e.key == "ArrowUp")            {  player.pula         = e.type == "keydown" ?  1 : 0;}
-  //if( e.key == "ArrowUp")            {  player.pilhaDeComandos = e.type == "keydown" ?  [...player.pilhaDeComandos, "pular"] : [...player.pilhaDeComandos]}
-  //if( e.key == "ArrowUp")            {  if(player.pilhaDeComandos["pular"] === undefined){ player.pilhaDeComandos["pular"] = pular } }
-  //if( e.key == "ArrowUp")            {  if(player.pilhaDeComandos["pular"] === undefined){ player.pilhaDeComandos["pular"] = pular } }
-  //if( e.key == "ArrowUp")            {  if(player.respostaAcoesPedidas["pular"] === undefined){ player.respostaAcoesPedidas["pular"] = pular } }
-  //if( e.key == "ArrowUp")              { player.pilhaDeComandos.push( {acao: "pular", frame: 0}) }
 
 }
 
 function gerenciadorComandos(player){
 
   console.log(player.pilhaDeComandos)
+  var ultimo;
+  var penultimo;
+  var sequencia = player.pilhaDeComandos.sequencia;
+  if( (sequencia) && sequencia.length >= 2){
+    ultimo = sequencia[sequencia.length - 1];
+    penultimo = sequencia[sequencia.length - 2];
+  }
   for(var key in player.pilhaDeComandos["direcoes"]){
     
     if(key == "dir" && (player.pilhaDeComandos["direcoes"]["dir"] == 1 ) ){
-      player.respostaAcoesPedidas["tryMoveDir"] = player.respostaAcoesPedidas["tryMoveDir"] === undefined ? tryMoveDir : player.respostaAcoesPedidas["tryMoveDir"];      
+      if(ultimo == "dir" && (penultimo == "dir") ){
+        player.respostaAcoesPedidas["tryMoveDir"] = player.respostaAcoesPedidas["tryMoveDir"] === undefined ? tryAvancoDir : player.respostaAcoesPedidas["tryMoveDir"];
+      }else{
+        player.respostaAcoesPedidas["tryMoveDir"] = player.respostaAcoesPedidas["tryMoveDir"] === undefined ? tryMoveDir : player.respostaAcoesPedidas["tryMoveDir"];
+      }      
     }
     if(key == "dir" && (player.pilhaDeComandos["direcoes"]["dir"] == 0 ) ){
       player.respostaAcoesPedidas["tryMoveDir"] !== undefined ? delete player.respostaAcoesPedidas["tryMoveDir"] : 0;      
@@ -620,8 +584,6 @@ function comandosLogicosNPC(jogavel){
 //#endregion
 
 
-
-
 //#region Event Listenners e Notificacoes
   document.addEventListener("keydown", function(event) {notifica(event);});
   document.addEventListener("keyup", function(event)   {notifica(event);});
@@ -634,8 +596,6 @@ function comandosLogicosNPC(jogavel){
 
   }
 //#endregion
-
-
 
 
 //#region Desenho
@@ -680,8 +640,6 @@ function comandosLogicosNPC(jogavel){
 //#endregion
 
 
-
-
 //#region Math
 
 function raio(ladoA, ladoB){ 
@@ -695,17 +653,16 @@ function distancia(A, B){
 
 //#endregion
 
+
 </script>
-
-
-
-
 
 <script>
     
     //facilitar o desenvolvimento, parece q se o codigo for bom deve ficar facil colocar melhorias
     //  e continuar
     //parei aqui - gerenciador de acoes e empilhar comandos e talvez acoes pois ainda nao ha distincao 
+    //replica do movimento de dash para a esquerda
+    //leitura da pilha com frame time
     //acao de knoback, soco e raduquen flash, idem em npc, logica de dano
     //flush no vetor de sequencia de comandos
     //todos os valores abixo de height precisam ser revisados
@@ -721,41 +678,13 @@ function distancia(A, B){
     //talvez o raio medio entre o raio externo e o interno
     //bug com tres teclas
 
-
     //ok - movimentacao simples, colocar pra Y e adequar classes, colisao simples
     //ok - colocar alguns objs e possivelmente uma classe
 
-    // const element = document.querySelector("textarea"),
-    //   ArrowRight = k => {
-    //      console.log(k);
-    //   },
-    //   ArrowLeft = k => {
-    //      console.log(k);
-    //   },
-    //   ArrowUp = k => {
-    //      console.log(k);
-    //   },
-    //   ArrowDown = k => {
-    //      console.log(k);
-    //   },
-    //   handler = {
-    //      ArrowRight,
-    //      ArrowLeft,
-    //      ArrowUp,
-    //      ArrowDown
-    //   };
-    //   element.addEventListener("keydown", e => {
-    //      const k = e.key;
-    //      if (handler.hasOwnProperty(k)) {
-    //         handler[k](k);
-    //      }
-    //   });
-
+   
     //nao funciona pois os valores estao no atributo inves do style
     //canvasHeight = document.getElementById("canvas").style.height;
     //canvasWidth = document.getElementById("canvas").style.width;
-
-
 
     //#region Logica de Codigo
     //Logica de Teclas
@@ -767,24 +696,6 @@ function distancia(A, B){
 
 
 </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 <body style="height: 100%; overflow: hidden;">
 
