@@ -108,7 +108,7 @@
 
     function pular(player){
       
-      if(isOnGround(player, elementosMapa.filter(obj => obj.groundable == 1 && obj.idObj != player.idObj)) ){
+      if(isOnGround(player, elementosMapa.filter(obj => obj.groundable == 1 && obj.idObj != player.idObj)) && (player.pulo === undefined) ){
         player.pulo = new Pulo({size: 4, cima: 15, baixo: 0});
       }
 
@@ -138,6 +138,50 @@
           player.nroPulos = player.nroPulos !== undefined ? player.nroPulos + 1 : 1;  
           delete player.pulo;
           delete player.respostaAcoesPedidas["pular"];
+        }
+      }
+
+    }
+
+    function impulse(player){
+      
+      // if(isOnGround(player, elementosMapa.filter(obj => obj.groundable == 1 && obj.idObj != player.idObj)) ){
+      //   player.pulo = new Pulo({size: 4, cima: 15, baixo: 0});
+      // }
+      if(player.impulse === undefined ){
+          player.impulse = new Impulse({"intensidade": 5, "direcao": "dir", "iteracoes": 5});
+      } 
+
+      if(player.impulse !== undefined){
+        player.impulse.performa(player);
+      }
+    }
+
+    class Impulse{
+      
+      constructor(obj){
+        this.intensidade = obj.intensidade;
+        this.direcao = obj.direcao;
+        this.iteracoes = obj.iteracoes;
+        if(obj.direcao == "dir")  { this.eixo = "x"; this.sentido =   1 }
+        if(obj.direcao == "esq")  { this.eixo = "x"; this.sentido =  -1 }
+        if(obj.direcao == "cima") { this.eixo = "y"; this.sentido =  -1 }
+        if(obj.direcao == "baixo"){ this.eixo = "y"; this.sentido =   1 }    
+      }
+
+      performa(player){
+
+
+        if(this.iteracoes > 0){
+          if( (tryMove(player, this.eixo, this.sentido, this.iteracoes))){
+            this.iteracoes--;
+          }else{
+            this.iteracoes = 0;
+          }
+        }else{
+          //player.nroPulos = player.nroPulos !== undefined ? player.nroPulos + 1 : 1;  
+          delete player.impulse;
+          delete player.respostaAcoesPedidas["impulse"];
         }
       }
 
@@ -249,6 +293,16 @@ function setaVetoresDirecao(player, e){
     }
   }
 
+  if( e.key == "a" || e.key == "A")         {  
+    if((e.type == "keydown") && (player.pilhaDeComandos["direcoes"]["a"] !== 1 ) ){
+      player.pilhaDeComandos["direcoes"]["a"] = 1;
+      player.pilhaDeComandos["sequencia"].push("a");
+    }
+    if((e.type == "keyup") && (player.pilhaDeComandos["direcoes"]["a"] !== 0 ) ){
+      player.pilhaDeComandos["direcoes"]["a"] = 0;
+    }
+  }
+
 }
 
 function gerenciadorComandos(player){
@@ -293,10 +347,19 @@ function gerenciadorComandos(player){
     }
 
     if(key == "cima" && (player.pilhaDeComandos["direcoes"]["cima"] == 1 ) ){
-      player.respostaAcoesPedidas["pular"] = player.respostaAcoesPedidas["pular"] === undefined ? pular : player.respostaAcoesPedidas["pular"];      
+      if( isOnGround(player, elementosMapa.filter(obj => obj.groundable == 1 && obj.idObj != player.idObj))  ){
+        player.respostaAcoesPedidas["pular"] = player.respostaAcoesPedidas["pular"] === undefined ? pular : player.respostaAcoesPedidas["pular"];
+      }      
     }
     if(key == "cima" && (player.pilhaDeComandos["direcoes"]["cima"] == 0 ) ){
       //player.respostaAcoesPedidas["pular"] !== undefined ? delete player.respostaAcoesPedidas["pular"] : 0;      
+    }
+
+    if(key == "a" && (player.pilhaDeComandos["direcoes"]["a"] == 1 ) ){
+      player.respostaAcoesPedidas["impulse"] = player.respostaAcoesPedidas["impulse"] === undefined ? impulse : player.respostaAcoesPedidas["impulse"];      
+    }
+    if(key == "a" && (player.pilhaDeComandos["direcoes"]["a"] == 0 ) ){
+      player.respostaAcoesPedidas["impulse"] = player.respostaAcoesPedidas["impulse"] === undefined ? impulse : player.respostaAcoesPedidas["impulse"];      
     }
 
   }
@@ -593,9 +656,9 @@ function comandosLogicosNPC(jogavel){
   // if(jogavel.respostaAcoesPedidas["pular"] === undefined){
   //   jogavel.respostaAcoesPedidas["pular"]
   // }
-  jogavel.nroPulos >= 1 ? 1 : pular(jogavel);
+  jogavel.nroPulos >= 5 ? 1 : pular(jogavel);
   
-  jogavel.nroPulos >= 1 ? delete jogavel.respostaAcoesPedidas["tryMoveDir"] : jogavel.respostaAcoesPedidas["tryMoveDir"] = tryMoveDir;
+  jogavel.nroPulos >= 5 ? delete jogavel.respostaAcoesPedidas["tryMoveDir"] : jogavel.respostaAcoesPedidas["tryMoveDir"] = tryMoveDir;
 
   //pular(jogavel); 
   // jogavel.nroPulos = jogavel.nroPulos !== undefined ? jogavel.nroPulos + 1 : 0;
